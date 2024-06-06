@@ -2,4 +2,4 @@
   import GuestLayout from "$components/GuestLayout.svelte";
 </script>
 
-<GuestLayout>FUCK</GuestLayout>
+<GuestLayout>FUCK THIS SHIT</GuestLayout>

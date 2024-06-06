@@ -1,9 +1,12 @@
 <script lang="ts">
-  import UserLayout from "$components/UserLayout.svelte";
+  import GuestLayout from "$components/GuestLayout.svelte";
 </script>
 
-<UserLayout>
-  <div class="flex w-full justify-center">
-    <div class="card w-96 bg-base-100 shadow-xl"></div>
-  </div>
-</UserLayout>
+<GuestLayout>
+  <p class="text-2xl">PLEASE LOGIN</p>
+  <form method="POST" action="/login">
+    <button type="submit" class="btn btn-primary">
+      LOGIN WITH CREDENTIALS
+    </button>
+  </form>
+</GuestLayout>
