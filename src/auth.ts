@@ -9,28 +9,25 @@ import { get_user_from_db } from "$lib/db";
 export const { handle, signIn, signOut } = SvelteKitAuth({
   providers: [
     Credentials({
-      // You can specify which fields should be submitted, by adding keys to the `credentials` object.
-      // e.g. domain, username, password, 2FA token, etc.
+      // HACK: we can't call the rust backend here
+      // so we will do the actual validation call in the client side
+      // we won't do any real authenticatation, we will just trick Auth.js
+      // to persist the user data
       credentials: {
-        email: {},
-        password: {},
+        user: {},
       },
       authorize: async (credentials) => {
         console.log("LOGIN ATTEMPT:", JSON.stringify(credentials));
         // TODO: refactor this shit
         try {
-          let user = null;
-
-          // @ts-ignore
-          const { email, password } =
-            await signInSchema.parseAsync(credentials);
-          const pwHash = await hash(password);
-          user = await get_user_from_db(email, pwHash);
+          const { user } = credentials;
           if (!user) {
             return null;
           }
           console.log("login success:", JSON.stringify(credentials));
-          return user;
+          const user_data = JSON.parse(user as string);
+          console.log("[USER_DATA]:", user_data);
+          return user_data;
         } catch (error) {
           if (error instanceof ZodError) {
             return null;
@@ -43,4 +40,7 @@ export const { handle, signIn, signOut } = SvelteKitAuth({
       },
     }),
   ],
+  pages: {
+    signIn: "/login",
+  },
 });
