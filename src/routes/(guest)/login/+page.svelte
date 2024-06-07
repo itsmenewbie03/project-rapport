@@ -4,7 +4,7 @@
   import { onMount } from "svelte";
   import { signIn } from "@auth/sveltekit/client";
   import { invoke } from "@tauri-apps/api/tauri";
-  import { goto } from "$app/navigation";
+  import { goto } from "$lib/utils";
   import toast from "svelte-french-toast";
 
   let email: string;
