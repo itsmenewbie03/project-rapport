@@ -15,7 +15,6 @@
     event.preventDefault();
     console.log(email, password);
     // NOTE: you leave me no choice, will this the stupid way xD
-    // @ts-ignore
     const actual_auth_res: object = await invoke("authenticate", {
       email,
       password,
