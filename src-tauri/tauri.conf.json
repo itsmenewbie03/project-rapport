@@ -7,7 +7,7 @@
   },
   "package": {
     "productName": "project-rapport",
-    "version": "0.1.1"
+    "version": "0.0.1"
   },
   "tauri": {
     "allowlist": {
@@ -28,7 +28,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "dev.itsmenewbie03.nglspammers",
+      "identifier": "dev.itsmenewbie03.project-rapport",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -54,10 +54,10 @@
     },
     "windows": [
       {
-        "fullscreen": false,
+        "fullscreen": true,
         "height": 600,
-        "resizable": true,
-        "title": "NGL Spammer by itsmenewbie03",
+        "resizable": false,
+        "title": "Project Rapport",
         "width": 800
       }
     ]
