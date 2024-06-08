@@ -5,6 +5,7 @@
   import { signIn } from "@auth/sveltekit/client";
   import { invoke } from "@tauri-apps/api/tauri";
   import { goto } from "$lib/utils";
+  import type { User } from "$lib/db";
   import toast from "svelte-french-toast";
 
   let email: string;
@@ -15,7 +16,7 @@
     event.preventDefault();
     console.log(email, password);
     // NOTE: you leave me no choice, will this the stupid way xD
-    const actual_auth_res: object = await invoke("authenticate", {
+    const actual_auth_res: User | null = await invoke("authenticate", {
       email,
       password,
     });
@@ -25,19 +26,26 @@
       return;
     }
     console.log("[RS_AUTH]:", actual_auth_res);
+    toast.success(`Welcome, ${actual_auth_res?.name}!`);
     const hack_auth_res = await signIn("credentials", {
       user: JSON.stringify(actual_auth_res),
+    }).catch((e) => {
+      console.log("signIn rejected the promise with:", e);
     });
     console.log("[AUTH]: ", hack_auth_res);
   };
 
   onMount(async () => {
-    loaded = true;
     if ($page.data.session) {
       // TODO: redirect user properly
-      console.log("you are signed in");
-      await goto("/dashboard");
+      await toast.promise(goto("/dashboard"), {
+        loading:
+          "You are already signed in, redirecting you to the dashboard...",
+        success: "Welcome to Project Rapport",
+        error: "Failed to redirect, please reload the page.",
+      });
     }
+    loaded = true;
   });
 </script>
 

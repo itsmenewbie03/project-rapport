@@ -1,10 +1,6 @@
 import { SvelteKitAuth } from "@auth/sveltekit";
 import { ZodError } from "zod";
 import Credentials from "@auth/sveltekit/providers/credentials";
-import { signInSchema } from "./lib/zod";
-// Your own logic for dealing with plaintext password strings; be careful!
-import { hash } from "$lib/hash";
-import { get_user_from_db } from "$lib/db";
 
 export const { handle, signIn, signOut } = SvelteKitAuth({
   providers: [
@@ -42,5 +38,6 @@ export const { handle, signIn, signOut } = SvelteKitAuth({
   ],
   pages: {
     signIn: "/login",
+    signOut: "/login",
   },
 });

@@ -23,3 +23,4 @@ const get_user_from_db = async (
 };
 
 export { get_user_from_db };
+export type { User };
