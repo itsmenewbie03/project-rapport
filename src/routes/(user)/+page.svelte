@@ -3,12 +3,16 @@
   import { page } from "$app/stores";
   import { goto } from "$app/navigation";
   import { onMount } from "svelte";
+  import toast from "svelte-french-toast";
   let loaded: boolean = false;
   onMount(async () => {
-    loaded = true;
     if ($page.data.session) {
-      await goto("/dashboard");
+      toast.success(`Welcome Back, ${$page.data.session?.name}`);
+      return await goto("/dashboard");
     }
+    toast.error("Please login first.");
+    await goto("/login");
+    loaded = true;
   });
 </script>
 
