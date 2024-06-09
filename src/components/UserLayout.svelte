@@ -2,11 +2,13 @@
   import "../app.css";
   import NavBar from "$components/NavBar.svelte";
   import { Toaster } from "svelte-french-toast";
+  import BreadCrumbs from "./BreadCrumbs.svelte";
 </script>
 
 <Toaster />
 <div class="flex flex-col min-h-screen">
   <NavBar />
+  <BreadCrumbs />
   <main class="flex-grow">
     <slot />
   </main>
