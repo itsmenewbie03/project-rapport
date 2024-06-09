@@ -26,7 +26,7 @@
     console.log("[RS_AUTH]:", actual_auth_res);
     localStorage.setItem("auth_token", actual_auth_res);
     await toast.promise(goto("/dashboard"), {
-      loading: "Login success, redirecting you to the dashboard",
+      loading: "Logged in. Redirecting...",
       success: "Welcome to Project Rapport",
       error: "Failed to redirect, please reload the page.",
     });

@@ -21,7 +21,7 @@
   <div class="flex flex-col h-[calc(100vh-116px)] justify-center items-center">
     {#if loaded}
       {#if $page.data.session}
-        <h1 class="text-4xl">Dashboard Page</h1>
+        <h1 class="text-4xl">Configurations Page</h1>
         <p class="text-md">
           This is a protected content. You can access this content because you
           are signed in.
