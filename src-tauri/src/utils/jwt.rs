@@ -4,6 +4,8 @@ use dotenv;
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
 
+use crate::utils::notifications::warn;
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
     pub exp: usize,
@@ -29,6 +31,7 @@ pub fn generate(claims: Claims) -> Option<String> {
             }
         }
         Err(err) => {
+            warn("The system detected a missing required environment variable. This will cause all authentication to fail.\nERR_CODE: 100");
             println!("[RUST]: failed to read env for the secret\nERROR: {}", err);
             None
         }
@@ -55,6 +58,7 @@ pub fn validate(token: &str) -> Option<Claims> {
             }
         }
         Err(err) => {
+            warn("The system detected a missing required environment variable. This will cause all authentication to fail.\nERR_CODE: 100");
             println!("[RUST]: failed to read env for the secret\nERROR: {}", err);
             None
         }
