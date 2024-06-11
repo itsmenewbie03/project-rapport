@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from "$app/stores";
-  import { get_icon } from "$lib/icons";
+  import { path } from "@tauri-apps/api";
+  import Icon from "./Icon.svelte";
   let paths = $page.url.pathname.split("/");
   paths.shift();
   paths = paths.map((value) => {
@@ -13,7 +14,7 @@
     {#each paths as path}
       <li>
         <span class="inline-flex gap-2 items-center">
-          {@html get_icon(path.toLowerCase())}
+          <Icon name={path.toLowerCase()} />
           {path}
         </span>
       </li>
