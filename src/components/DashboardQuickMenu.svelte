@@ -5,7 +5,7 @@
 <ul class="menu bg-base-200 w-56 rounded-box">
   <li class="menu-title">Quick Actions</li>
   <li>
-    <a href="/feedback">
+    <a href="/feedback/consent">
       <Icon name="start" />
       Start Feedback
     </a>
