@@ -5,7 +5,7 @@
   import { page } from "$app/stores";
   import ConfirmModal from "./ConfirmModal.svelte";
 
-  const is_feedback_page = $page.url.pathname === "/feedback";
+  const is_feedback_page = $page.url.pathname.includes("feedback");
   let secret_hits: number = 0;
   let timeout: Timer;
   let modal_handle: any;
