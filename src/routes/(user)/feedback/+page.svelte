@@ -3,7 +3,7 @@
   import LoadingBars from "$components/LoadingBars.svelte";
   import { page } from "$app/stores";
   import { onMount } from "svelte";
-  import { goto } from "$app/navigation";
+  import { beforeNavigate, goto } from "$app/navigation";
   import toast from "svelte-french-toast";
   let loaded: boolean = false;
   onMount(async () => {
@@ -16,13 +16,24 @@
       loaded = true;
     }, 1000);
   });
+
+  beforeNavigate((nav) => {
+    // WARN: this might cause in page navigation to fail
+    // keep an eye on this
+    const is_allowed_to_exit =
+      localStorage.getItem("allowed_to_exit") === "true";
+    if (nav.to?.route.id === "/(user)/dashboard" && !is_allowed_to_exit) {
+      toast.error("You are not allowed to navigate back to dashboard.");
+      nav.cancel();
+    }
+  });
 </script>
 
 <UserLayout>
   <div class="flex flex-col h-[calc(100vh-144px)] justify-center items-center">
     {#if loaded}
       {#if $page.data.session}
-        <h1 class="text-4xl">Analytics Page</h1>
+        <h1 class="text-4xl">Feedback Page</h1>
         <p class="text-md">
           This is a protected content. You can access this content because you
           are signed in.
