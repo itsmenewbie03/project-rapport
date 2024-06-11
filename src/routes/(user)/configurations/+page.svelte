@@ -1,5 +1,6 @@
 <script lang="ts">
   import UserLayout from "$components/UserLayout.svelte";
+  import LoadingBars from "$components/LoadingBars.svelte";
   import { page } from "$app/stores";
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
@@ -18,7 +19,7 @@
 </script>
 
 <UserLayout>
-  <div class="flex flex-col h-[calc(100vh-116px)] justify-center items-center">
+  <div class="flex flex-col h-[calc(100vh-144px)] justify-center items-center">
     {#if loaded}
       {#if $page.data.session}
         <h1 class="text-4xl">Configurations Page</h1>
@@ -38,7 +39,7 @@
         <h1>Access Denied</h1>
       {/if}
     {:else}
-      <span class="loading loading-bars loading-lg"></span>
+      <LoadingBars />
     {/if}
   </div>
 </UserLayout>
