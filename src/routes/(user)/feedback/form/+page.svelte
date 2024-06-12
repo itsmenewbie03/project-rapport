@@ -1,13 +1,53 @@
 <script lang="ts">
   import UserLayout from "$components/UserLayout.svelte";
   import LoadingBars from "$components/LoadingBars.svelte";
+  import toast from "svelte-french-toast";
   import { page } from "$app/stores";
   import { onMount } from "svelte";
   import { beforeNavigate, goto } from "$app/navigation";
-  import toast from "svelte-french-toast";
+  import { invoke } from "@tauri-apps/api/tauri";
+  import { gen_uuid } from "$lib/uuids";
   let loaded: boolean = false;
+  let responsiveness: number = 3;
+  let reliability: number = 3;
+  let access_and_facilities: number = 3;
+  let communication: number = 3;
+  let value_for_money: number = 3;
+  let integrity: number = 3;
+  let assurance: number = 3;
+  let outcome: number = 3;
+  let overall_satisfaction: number = 3;
+  let uuid: string = "";
+
+  const submit = async (event: Event) => {
+    event.preventDefault();
+    const data = {
+      responsiveness,
+      reliability,
+      access_and_facilities,
+      communication,
+      value_for_money,
+      integrity,
+      assurance,
+      outcome,
+      overall_satisfaction,
+    };
+    console.log(data);
+    try {
+      const response: any = await invoke("submit_feedback", {
+        id: uuid,
+        feedback: JSON.stringify(data),
+      });
+      toast.success(response);
+    } catch (err: any) {
+      toast.error(err);
+    }
+  };
 
   onMount(async () => {
+    // INFO: generate a unique id for this feedback session
+    uuid = gen_uuid();
+
     if (!$page.data.session) {
       toast.error("Please login first.");
       await goto("/login");
@@ -22,6 +62,18 @@
     setTimeout(() => {
       loaded = true;
     }, 1000);
+    // INFO: when user allowed_face_recording we should tell our backend to start recording
+    if (localStorage.getItem("allowed_face_recording") === "true") {
+      try {
+        await invoke("start_face_recording", {
+          id: uuid,
+        });
+        toast.success("You are now being recorded.");
+      } catch (error: any) {
+        toast.error("There was an error starting the recording.");
+        // TODO: implement logging for debugging
+      }
+    }
     // NOTE: consent is only valid for one feedback session
     localStorage.removeItem("consent_given");
     localStorage.removeItem("allowed_face_recording");
@@ -62,27 +114,36 @@
                   <input
                     type="radio"
                     name="rating-1"
+                    value={1}
+                    bind:group={responsiveness}
                     class="mask mask-heart bg-red-400"
                   />
                   <input
                     type="radio"
                     name="rating-1"
+                    value={2}
+                    bind:group={responsiveness}
                     class="mask mask-heart bg-orange-400"
-                    checked
                   />
                   <input
                     type="radio"
                     name="rating-1"
+                    value={3}
+                    bind:group={responsiveness}
                     class="mask mask-heart bg-yellow-400"
                   />
                   <input
                     type="radio"
                     name="rating-1"
+                    value={4}
+                    bind:group={responsiveness}
                     class="mask mask-heart bg-lime-400"
                   />
                   <input
                     type="radio"
                     name="rating-1"
+                    value={5}
+                    bind:group={responsiveness}
                     class="mask mask-heart bg-green-400"
                   />
                 </div>
@@ -95,27 +156,36 @@
                   <input
                     type="radio"
                     name="rating-2"
+                    value={1}
+                    bind:group={reliability}
                     class="mask mask-heart bg-red-400"
                   />
                   <input
                     type="radio"
                     name="rating-2"
+                    value={2}
+                    bind:group={reliability}
                     class="mask mask-heart bg-orange-400"
-                    checked
                   />
                   <input
                     type="radio"
                     name="rating-2"
+                    value={3}
+                    bind:group={reliability}
                     class="mask mask-heart bg-yellow-400"
                   />
                   <input
                     type="radio"
                     name="rating-2"
+                    value={4}
+                    bind:group={reliability}
                     class="mask mask-heart bg-lime-400"
                   />
                   <input
                     type="radio"
                     name="rating-2"
+                    value={5}
+                    bind:group={reliability}
                     class="mask mask-heart bg-green-400"
                   />
                 </div>
@@ -128,27 +198,36 @@
                   <input
                     type="radio"
                     name="rating-3"
+                    value={1}
+                    bind:group={access_and_facilities}
                     class="mask mask-heart bg-red-400"
                   />
                   <input
                     type="radio"
                     name="rating-3"
+                    value={2}
+                    bind:group={access_and_facilities}
                     class="mask mask-heart bg-orange-400"
-                    checked
                   />
                   <input
                     type="radio"
                     name="rating-3"
+                    value={3}
+                    bind:group={access_and_facilities}
                     class="mask mask-heart bg-yellow-400"
                   />
                   <input
                     type="radio"
                     name="rating-3"
+                    value={4}
+                    bind:group={access_and_facilities}
                     class="mask mask-heart bg-lime-400"
                   />
                   <input
                     type="radio"
                     name="rating-3"
+                    value={5}
+                    bind:group={access_and_facilities}
                     class="mask mask-heart bg-green-400"
                   />
                 </div>
@@ -161,27 +240,36 @@
                   <input
                     type="radio"
                     name="rating-4"
+                    value={1}
+                    bind:group={communication}
                     class="mask mask-heart bg-red-400"
                   />
                   <input
                     type="radio"
                     name="rating-4"
+                    value={2}
+                    bind:group={communication}
                     class="mask mask-heart bg-orange-400"
-                    checked
                   />
                   <input
                     type="radio"
                     name="rating-4"
+                    value={3}
+                    bind:group={communication}
                     class="mask mask-heart bg-yellow-400"
                   />
                   <input
                     type="radio"
                     name="rating-4"
+                    value={4}
+                    bind:group={communication}
                     class="mask mask-heart bg-lime-400"
                   />
                   <input
                     type="radio"
                     name="rating-4"
+                    value={5}
+                    bind:group={communication}
                     class="mask mask-heart bg-green-400"
                   />
                 </div>
@@ -194,27 +282,36 @@
                   <input
                     type="radio"
                     name="rating-5"
+                    value={1}
+                    bind:group={value_for_money}
                     class="mask mask-heart bg-red-400"
                   />
                   <input
                     type="radio"
                     name="rating-5"
+                    value={2}
+                    bind:group={value_for_money}
                     class="mask mask-heart bg-orange-400"
-                    checked
                   />
                   <input
                     type="radio"
                     name="rating-5"
+                    value={3}
+                    bind:group={value_for_money}
                     class="mask mask-heart bg-yellow-400"
                   />
                   <input
                     type="radio"
                     name="rating-5"
+                    value={4}
+                    bind:group={value_for_money}
                     class="mask mask-heart bg-lime-400"
                   />
                   <input
                     type="radio"
                     name="rating-5"
+                    value={5}
+                    bind:group={value_for_money}
                     class="mask mask-heart bg-green-400"
                   />
                 </div>
@@ -227,27 +324,36 @@
                   <input
                     type="radio"
                     name="rating-6"
+                    value={1}
+                    bind:group={integrity}
                     class="mask mask-heart bg-red-400"
                   />
                   <input
                     type="radio"
                     name="rating-6"
+                    value={2}
+                    bind:group={integrity}
                     class="mask mask-heart bg-orange-400"
-                    checked
                   />
                   <input
                     type="radio"
                     name="rating-6"
+                    value={3}
+                    bind:group={integrity}
                     class="mask mask-heart bg-yellow-400"
                   />
                   <input
                     type="radio"
                     name="rating-6"
+                    value={4}
+                    bind:group={integrity}
                     class="mask mask-heart bg-lime-400"
                   />
                   <input
                     type="radio"
                     name="rating-6"
+                    value={5}
+                    bind:group={integrity}
                     class="mask mask-heart bg-green-400"
                   />
                 </div>
@@ -260,27 +366,36 @@
                   <input
                     type="radio"
                     name="rating-7"
+                    value={1}
+                    bind:group={assurance}
                     class="mask mask-heart bg-red-400"
                   />
                   <input
                     type="radio"
                     name="rating-7"
+                    value={2}
+                    bind:group={assurance}
                     class="mask mask-heart bg-orange-400"
-                    checked
                   />
                   <input
                     type="radio"
                     name="rating-7"
+                    value={3}
+                    bind:group={assurance}
                     class="mask mask-heart bg-yellow-400"
                   />
                   <input
                     type="radio"
                     name="rating-7"
+                    value={4}
+                    bind:group={assurance}
                     class="mask mask-heart bg-lime-400"
                   />
                   <input
                     type="radio"
                     name="rating-7"
+                    value={5}
+                    bind:group={assurance}
                     class="mask mask-heart bg-green-400"
                   />
                 </div>
@@ -293,27 +408,36 @@
                   <input
                     type="radio"
                     name="rating-8"
+                    value={1}
+                    bind:group={outcome}
                     class="mask mask-heart bg-red-400"
                   />
                   <input
                     type="radio"
                     name="rating-8"
+                    value={2}
+                    bind:group={outcome}
                     class="mask mask-heart bg-orange-400"
-                    checked
                   />
                   <input
                     type="radio"
                     name="rating-8"
+                    value={3}
+                    bind:group={outcome}
                     class="mask mask-heart bg-yellow-400"
                   />
                   <input
                     type="radio"
                     name="rating-8"
+                    value={4}
+                    bind:group={outcome}
                     class="mask mask-heart bg-lime-400"
                   />
                   <input
                     type="radio"
                     name="rating-8"
+                    value={5}
+                    bind:group={outcome}
                     class="mask mask-heart bg-green-400"
                   />
                 </div>
@@ -326,34 +450,45 @@
                   <input
                     type="radio"
                     name="rating-9"
+                    value={1}
+                    bind:group={overall_satisfaction}
                     class="mask mask-heart bg-red-400"
                   />
                   <input
                     type="radio"
                     name="rating-9"
+                    value={2}
+                    bind:group={overall_satisfaction}
                     class="mask mask-heart bg-orange-400"
-                    checked
                   />
                   <input
                     type="radio"
                     name="rating-9"
+                    value={3}
+                    bind:group={overall_satisfaction}
                     class="mask mask-heart bg-yellow-400"
                   />
                   <input
                     type="radio"
                     name="rating-9"
+                    value={4}
+                    bind:group={overall_satisfaction}
                     class="mask mask-heart bg-lime-400"
                   />
                   <input
                     type="radio"
                     name="rating-9"
+                    value={5}
+                    bind:group={overall_satisfaction}
                     class="mask mask-heart bg-green-400"
                   />
                 </div>
               </div>
             </div>
           </div>
-          <button class="btn btn-primary float-end mt-4"> Submit </button>
+          <button class="btn btn-primary float-end mt-4" on:click={submit}>
+            Submit
+          </button>
         </div>
       {:else}
         <h1>Access Denied</h1>

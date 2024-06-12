@@ -9,6 +9,8 @@ use utils::db;
 use utils::jwt;
 use utils::jwt::Claims;
 
+use crate::utils::feedback::FeedbackData;
+
 #[tauri::command]
 async fn authenticate(email: &str, password: &str) -> Result<Option<String>, ()> {
     println!("[RUST]: authentication for {}:{}", email, password);
@@ -53,9 +55,47 @@ async fn get_session(token: Option<&str>) -> Result<Option<UserData>, ()> {
         None => Ok(None),
     }
 }
+
+#[tauri::command]
+async fn start_face_recording(id: &str) -> Result<String, String> {
+    // NOTE: for now we just say every thing succeds
+    println!("[RUST]: recording started for feedback_id: {}", id);
+    // NOTE: we just simulate an error case xD
+    // utils::notifications::warn("We have an issue starting the recording!\nERROR_CODE: UKNOWN");
+    Ok(format!("Recording started for feedback_id: {}", id))
+}
+
+#[tauri::command]
+async fn submit_feedback(id: &str, feedback: &str) -> Result<String, String> {
+    // TODO: stop the recording
+    // ...
+    // ...
+    // ...
+
+    let feedback_data = FeedbackData::parse(feedback);
+    match feedback_data {
+        Ok(feedback_data) => {
+            println!(
+                "[RUST]: feedback submitted for feedback_id: {}\n[RUST]: feedback data: {:?}",
+                id, feedback_data
+            );
+            Ok("Feedback submitted successfully".to_owned())
+        }
+        Err(e) => {
+            println!("[RUST]: failed to parse feedback data: {}", e);
+            Err("Failed to parse feedback data".to_owned())
+        }
+    }
+}
+
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![authenticate, get_session])
+        .invoke_handler(tauri::generate_handler![
+            authenticate,
+            get_session,
+            start_face_recording,
+            submit_feedback
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
