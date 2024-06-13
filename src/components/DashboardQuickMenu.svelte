@@ -6,7 +6,7 @@
   <li class="menu-title">Quick Actions</li>
   <li>
     <a href="/feedback/consent">
-      <Icon name="start" />
+      <Icon name="start" _class="size-5" />
       Start Feedback
     </a>
   </li>
