@@ -1,6 +1,7 @@
 <script lang="ts">
   import UserLayout from "$components/UserLayout.svelte";
   import LoadingBars from "$components/LoadingBars.svelte";
+  import QuickTip from "$components/QuickTip.svelte";
   import toast from "svelte-french-toast";
   import { page } from "$app/stores";
   import { onMount } from "svelte";
@@ -99,7 +100,14 @@
 
         <div class="px-14 py-4">
           <div>
-            <p class="text-2xl font-bold">Tell us what you think!</p>
+            <div class="flex flex-inline items-center">
+              <p class="text-2xl font-bold">Tell us what you think!</p>
+              <QuickTip
+                title="Rating"
+                description="This feedback scale uses colors! Red means very unhappy, orange unhappy, yellow okay, lime happy, and green very happy."
+              />
+            </div>
+
             <p>
               We greatly value your opinion. Please assess your experience with
               our product or service by selecting the icons that corresponds to
@@ -109,7 +117,13 @@
               <div
                 class="rating rating-lg gap-8 grid grid-cols-2 flex-inline items-center"
               >
-                <p class="text-xl font-bold">Responsiveness</p>
+                <div class="flex flex-inline items-center">
+                  <p class="text-xl font-bold">Responsiveness</p>
+                  <QuickTip
+                    title="Responsiveness"
+                    description="The willingness to help, assist and provide prompt service to citizens/clients."
+                  />
+                </div>
                 <div class="flex justify-between">
                   <input
                     type="radio"
@@ -151,7 +165,13 @@
               <div
                 class="rating rating-lg gap-8 grid grid-cols-2 flex-inline items-center"
               >
-                <p class="text-xl font-bold">Reliability (Quality)</p>
+                <div class="flex flex-inline items-center">
+                  <p class="text-xl font-bold">Reliability (Quality)</p>
+                  <QuickTip
+                    title="Reliability (Quality)"
+                    description="The provision of what is needed and what was promised, following the policy and standards, with zero to a minimal error rate"
+                  />
+                </div>
                 <div class="flex justify-between">
                   <input
                     type="radio"
@@ -193,7 +213,13 @@
               <div
                 class="rating rating-lg gap-8 grid grid-cols-2 flex-inline items-center"
               >
-                <p class="text-xl font-bold">Access and Facilities</p>
+                <div class="flex flex-inline items-center">
+                  <p class="text-xl font-bold">Access and Facilities</p>
+                  <QuickTip
+                    title="Access and Facilities"
+                    description="The convenience of location, ample amenities for comfortable transactions, use of clear signages and modes of technology."
+                  />
+                </div>
                 <div class="flex justify-between">
                   <input
                     type="radio"
@@ -235,7 +261,13 @@
               <div
                 class="rating rating-lg gap-8 grid grid-cols-2 flex-inline items-center"
               >
-                <p class="text-xl font-bold">Communication</p>
+                <div class="flex flex-inline items-center">
+                  <p class="text-xl font-bold">Communication</p>
+                  <QuickTip
+                    title="Communication"
+                    description="The act of keeping citizens and clients informed in a language they can easily understand, as well as listening to their feedback."
+                  />
+                </div>
                 <div class="flex justify-between">
                   <input
                     type="radio"
@@ -277,7 +309,15 @@
               <div
                 class="rating rating-lg gap-8 grid grid-cols-2 flex-inline items-center"
               >
-                <p class="text-xl font-bold">Value for money (If applicable)</p>
+                <div class="flex flex-inline items-center">
+                  <p class="text-xl font-bold">
+                    Value for money (If applicable)
+                  </p>
+                  <QuickTip
+                    title="Value for money (If applicable)"
+                    description="The satisfaction with timeliness of the billing, billing process/es, preferred methods of payment, reasonable payment period, the acceptable range of costs, and qualitative information on the cost of each service"
+                  />
+                </div>
                 <div class="flex justify-between">
                   <input
                     type="radio"
@@ -319,7 +359,13 @@
               <div
                 class="rating rating-lg gap-8 grid grid-cols-2 flex-inline items-center"
               >
-                <p class="text-xl font-bold">Integrity</p>
+                <div class="flex flex-inline items-center">
+                  <p class="text-xl font-bold">Integrity</p>
+                  <QuickTip
+                    title="Integrity"
+                    description="The assurance that there is honesty, justice, fairness, and trust in each service while dealing with the citizens/clients."
+                  />
+                </div>
                 <div class="flex justify-between">
                   <input
                     type="radio"
@@ -361,7 +407,13 @@
               <div
                 class="rating rating-lg gap-8 grid grid-cols-2 flex-inline items-center"
               >
-                <p class="text-xl font-bold">Assurance</p>
+                <div class="flex flex-inline items-center">
+                  <p class="text-xl font-bold">Assurance</p>
+                  <QuickTip
+                    title="Assurance"
+                    description="The capability of frontline staff to perform their duties, product and service knowledge, understanding citizen/client needs, helpfulness, and good work relationships."
+                  />
+                </div>
                 <div class="flex justify-between">
                   <input
                     type="radio"
@@ -403,7 +455,13 @@
               <div
                 class="rating rating-lg gap-8 grid grid-cols-2 flex-inline items-center"
               >
-                <p class="text-xl font-bold">Outcome</p>
+                <div class="flex flex-inline items-center">
+                  <p class="text-xl font-bold">Outcome</p>
+                  <QuickTip
+                    title="Outcome"
+                    description="The extent of achieving outcomes or realizing the intended benefits of government services."
+                  />
+                </div>
                 <div class="flex justify-between">
                   <input
                     type="radio"

@@ -47,7 +47,7 @@
     <p class="py-4">Please verify you indentity by entering your password.</p>
     <form class="form-control" id="password_confirm_form" on:submit={_confirm}>
       <label class="input input-bordered flex items-center gap-2">
-        <Icon name="password" />
+        <Icon name="password" _class="size-4 opacity-70" viewBox="0 0 16 16" />
         <input type="password" class="grow" bind:value={password} required />
       </label>
     </form>
