@@ -9,7 +9,7 @@ use utils::db;
 use utils::jwt;
 use utils::jwt::Claims;
 
-use crate::utils::feedback::FeedbackData;
+use crate::utils::{feedback::FeedbackData, recorder};
 
 #[tauri::command]
 async fn authenticate(email: &str, password: &str) -> Result<Option<String>, ()> {
@@ -60,18 +60,19 @@ async fn get_session(token: Option<&str>) -> Result<Option<UserData>, ()> {
 async fn start_face_recording(id: &str) -> Result<String, String> {
     // NOTE: for now we just say every thing succeds
     println!("[RUST]: recording started for feedback_id: {}", id);
-    // NOTE: we just simulate an error case xD
-    // utils::notifications::warn("We have an issue starting the recording!\nERROR_CODE: UKNOWN");
-    Ok(format!("Recording started for feedback_id: {}", id))
+    match recorder::start(id).await {
+        Ok(res) => Ok(res),
+        Err(err) => {
+            // NOTE: we can warn the user about the error
+            utils::notifications::warn(&err);
+            Err(err)
+        }
+    }
 }
 
 #[tauri::command]
 async fn submit_feedback(id: &str, feedback: &str) -> Result<String, String> {
-    // TODO: stop the recording
-    // ...
-    // ...
-    // ...
-
+    recorder::stop().await;
     let feedback_data = FeedbackData::parse(feedback);
     match feedback_data {
         Ok(feedback_data) => {
@@ -87,6 +88,11 @@ async fn submit_feedback(id: &str, feedback: &str) -> Result<String, String> {
         }
     }
 }
+#[tauri::command]
+async fn clear_recording(id: &str) -> Result<String, String> {
+    recorder::clear(id).await;
+    Ok("Recording cleared!".to_owned())
+}
 
 fn main() {
     tauri::Builder::default()
@@ -94,7 +100,8 @@ fn main() {
             authenticate,
             get_session,
             start_face_recording,
-            submit_feedback
+            submit_feedback,
+            clear_recording
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

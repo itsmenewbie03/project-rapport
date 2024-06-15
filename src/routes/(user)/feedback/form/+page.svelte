@@ -7,8 +7,15 @@
   import { onMount } from "svelte";
   import { beforeNavigate, goto } from "$app/navigation";
   import { invoke } from "@tauri-apps/api/tauri";
+  import { confirm } from "@tauri-apps/api/dialog";
   import { gen_uuid } from "$lib/uuids";
+
   let loaded: boolean = false;
+  let uuid: string = "";
+  let dont_stop: boolean = false;
+  let recording: boolean = false;
+
+  // INFO: feedback data
   let responsiveness: number = 3;
   let reliability: number = 3;
   let access_and_facilities: number = 3;
@@ -18,7 +25,6 @@
   let assurance: number = 3;
   let outcome: number = 3;
   let overall_satisfaction: number = 3;
-  let uuid: string = "";
 
   const submit = async (event: Event) => {
     event.preventDefault();
@@ -56,6 +62,7 @@
     // TODO: check for flags in localStorage
     if (localStorage.getItem("consent_given") !== "true") {
       toast.error("Please provide consent first.");
+      // BUG: remove to activate the feature
       // await goto("/feedback/consent");
       // return;
     }
@@ -70,6 +77,7 @@
           id: uuid,
         });
         toast.success("You are now being recorded.");
+        recording = true;
       } catch (error: any) {
         toast.error("There was an error starting the recording.");
         // TODO: implement logging for debugging
@@ -80,7 +88,7 @@
     localStorage.removeItem("allowed_face_recording");
   });
 
-  beforeNavigate((nav) => {
+  beforeNavigate(async (nav) => {
     // WARN: this might cause in page navigation to fail
     // keep an eye on this
     const is_allowed_to_exit =
@@ -88,6 +96,35 @@
     if (nav.to?.route.id === "/(user)/dashboard" && !is_allowed_to_exit) {
       toast.error("You are not allowed to navigate back to dashboard.");
       nav.cancel();
+      return;
+    }
+    if (
+      recording &&
+      nav.to?.route.id === "/(user)/feedback/consent" &&
+      !dont_stop
+    ) {
+      // NOTE: for some reason the navigation continues itself so we stop it and manually navigate
+      nav.cancel();
+      let toast_id = toast.loading("Confirmation needed, waiting...");
+      let confirmed = await confirm(
+        "Returning to the consent screen will stop the recording and delete the file.",
+        "Are you sure you want to proceed?",
+      );
+      console.log(`Confirmed: ${confirmed}`);
+      if (!confirmed) {
+        toast.remove(toast_id);
+        return;
+      }
+      toast.remove(toast_id);
+      toast.promise(invoke("clear_recording", { id: uuid }), {
+        loading: "Stopping recording and deleting file...",
+        success: "Recording stopped successfully. The file has been deleted.",
+        error:
+          "We encountered a problem stopping the recording and deleting the file",
+      });
+      // INFO: manual redirect
+      dont_stop = true;
+      await goto("/feedback/consent");
     }
   });
 </script>
