@@ -9,3 +9,5 @@ node_modules
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 sqlite.db*
+pyrightconfig.json
+start_pybackend.sh
