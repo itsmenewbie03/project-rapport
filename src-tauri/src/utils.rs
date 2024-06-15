@@ -4,3 +4,4 @@ pub mod encryption;
 pub mod feedback;
 pub mod jwt;
 pub mod notifications;
+pub mod recorder;
