@@ -12,7 +12,7 @@ def is_dangerous_filename(filename):
     return bool(re.search(pattern, filename))
 
 
-def start_capture(output_file: str, fps=25, resolution="640x480"):
+def start_capture(output_file: str, fps=30, resolution="640x480"):
 
     global recording_active
     if recording_active:

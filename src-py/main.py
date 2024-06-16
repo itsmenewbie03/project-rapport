@@ -1,11 +1,11 @@
 import importlib
-import random
 
 from flask import Flask, request
 
 # NOTE: what the fuck is this abomination?
 recorder = importlib.import_module("recorder", "src-py")
-
+faau = importlib.import_module("faau", "src-py")
+faau.preload_model()
 app = Flask(__name__)
 
 
@@ -20,6 +20,18 @@ def start_recording():
     if not is_recording:
         return "Recorder busy...", 400
     return "Recording started successfully"
+
+
+@app.route("/start_analysis", methods=["POST"])
+def start_analysis():
+    data = request.form
+    feedback_id = data.get("feedback_id")
+    if not feedback_id:
+        return "Missing Required Params", 400
+    is_started = faau.start_analysis(feedback_id)
+    if not is_started:
+        return "Faau busy...", 400
+    return "Analysis started successfully"
 
 
 @app.route("/stop_recording")
