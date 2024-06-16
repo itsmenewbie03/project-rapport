@@ -9,7 +9,7 @@ use utils::db;
 use utils::jwt;
 use utils::jwt::Claims;
 
-use crate::utils::{feedback::FeedbackData, recorder};
+use crate::utils::{faau, feedback::FeedbackData, recorder};
 
 #[tauri::command]
 async fn authenticate(email: &str, password: &str) -> Result<Option<String>, ()> {
@@ -80,6 +80,9 @@ async fn submit_feedback(id: &str, feedback: &str) -> Result<String, String> {
                 "[RUST]: feedback submitted for feedback_id: {}\n[RUST]: feedback data: {:?}",
                 id, feedback_data
             );
+            // BUG: handle the Err variant
+            faau::start(id).await.unwrap();
+            feedback_data.save(id);
             Ok("Feedback submitted successfully".to_owned())
         }
         Err(e) => {
