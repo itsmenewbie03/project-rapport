@@ -1,3 +1,4 @@
+use std::{fs::File, io::Write};
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct FeedbackData {
     pub responsiveness: u8,
@@ -17,5 +18,13 @@ impl FeedbackData {
             Ok(feedback_data) => Ok(feedback_data),
             Err(e) => Err(e.to_string()),
         }
+    }
+    pub fn save(&self, id: &str) {
+        let mut file =
+            File::create(format!("{}_feedback.json", id)).expect("Failed to create a file!");
+        let feedback_data =
+            serde_json::to_string(self).expect("Failed to convert feedback data to json");
+        file.write_all(feedback_data.as_bytes())
+            .expect("Failed to write feedback data to file");
     }
 }
