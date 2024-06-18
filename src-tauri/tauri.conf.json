@@ -12,7 +12,8 @@
   "tauri": {
     "allowlist": {
       "dialog": {
-        "confirm": true
+        "confirm": true,
+        "message": true
       },
       "all": false
     },

@@ -7,7 +7,7 @@
   import { onMount } from "svelte";
   import { beforeNavigate, goto } from "$app/navigation";
   import { invoke } from "@tauri-apps/api/tauri";
-  import { confirm } from "@tauri-apps/api/dialog";
+  import { confirm, message } from "@tauri-apps/api/dialog";
   import { gen_uuid } from "$lib/uuids";
 
   let loaded: boolean = false;
@@ -16,15 +16,77 @@
   let recording: boolean = false;
 
   // INFO: feedback data
-  let responsiveness: number = 3;
-  let reliability: number = 3;
-  let access_and_facilities: number = 3;
-  let communication: number = 3;
-  let value_for_money: number = 3;
-  let integrity: number = 3;
-  let assurance: number = 3;
-  let outcome: number = 3;
-  let overall_satisfaction: number = 3;
+  let responsiveness: number = 0;
+  $: responsiveness,
+    (async () => {
+      if (responsiveness) {
+        await take_photo("responsiveness");
+      }
+    })();
+
+  let reliability: number = 0;
+  $: reliability,
+    (async () => {
+      if (reliability) {
+        await take_photo("reliability");
+      }
+    })();
+
+  let access_and_facilities: number = 0;
+  $: access_and_facilities,
+    (async () => {
+      if (access_and_facilities) {
+        await take_photo("access_and_facilities");
+      }
+    })();
+
+  let communication: number = 0;
+  $: communication,
+    (async () => {
+      if (communication) {
+        await take_photo("communication");
+      }
+    })();
+
+  let value_for_money: number = 0;
+  $: value_for_money,
+    (async () => {
+      if (value_for_money) {
+        await take_photo("value_for_money");
+      }
+    })();
+
+  let integrity: number = 0;
+  $: integrity,
+    (async () => {
+      if (integrity) {
+        await take_photo("integrity");
+      }
+    })();
+
+  let assurance: number = 0;
+  $: assurance,
+    (async () => {
+      if (assurance) {
+        await take_photo("assurance");
+      }
+    })();
+
+  let outcome: number = 0;
+  $: outcome,
+    (async () => {
+      if (outcome) {
+        await take_photo("outcome");
+      }
+    })();
+
+  let overall_satisfaction: number = 0;
+  $: overall_satisfaction,
+    (async () => {
+      if (overall_satisfaction) {
+        await take_photo("overall_satisfaction");
+      }
+    })();
 
   const submit = async (event: Event) => {
     event.preventDefault();
@@ -44,11 +106,25 @@
       const response: any = await invoke("submit_feedback", {
         id: uuid,
         feedback: JSON.stringify(data),
+        recording: recording,
       });
-      toast.success(response);
+      toast.success(
+        `Your feedback has been submitted successfully. ${recording ? "Recording is also stopped." : ""} You will be redirected back to the consent screen shortly.`,
+      );
+      setTimeout(async () => {
+        dont_stop = true;
+        await goto("/feedback/consent");
+      }, 3000);
     } catch (err: any) {
       toast.error(err);
     }
+  };
+
+  const take_photo = async (quality: string) => {
+    await invoke("take_photo", {
+      id: uuid,
+      quality: quality,
+    });
   };
 
   onMount(async () => {
@@ -165,6 +241,14 @@
                   <input
                     type="radio"
                     name="rating-1"
+                    value={0}
+                    bind:group={responsiveness}
+                    class="mask mask-heart bg-red-400"
+                    hidden
+                  />
+                  <input
+                    type="radio"
+                    name="rating-1"
                     value={1}
                     bind:group={responsiveness}
                     class="mask mask-heart bg-red-400"
@@ -210,6 +294,14 @@
                   />
                 </div>
                 <div class="flex justify-between">
+                  <input
+                    type="radio"
+                    name="rating-2"
+                    value={0}
+                    bind:group={reliability}
+                    class="mask mask-heart bg-red-400"
+                    hidden
+                  />
                   <input
                     type="radio"
                     name="rating-2"
@@ -261,6 +353,14 @@
                   <input
                     type="radio"
                     name="rating-3"
+                    value={0}
+                    bind:group={access_and_facilities}
+                    class="mask mask-heart bg-red-400"
+                    hidden
+                  />
+                  <input
+                    type="radio"
+                    name="rating-3"
                     value={1}
                     bind:group={access_and_facilities}
                     class="mask mask-heart bg-red-400"
@@ -306,6 +406,14 @@
                   />
                 </div>
                 <div class="flex justify-between">
+                  <input
+                    type="radio"
+                    name="rating-4"
+                    value={0}
+                    bind:group={communication}
+                    class="mask mask-heart bg-red-400"
+                    hidden
+                  />
                   <input
                     type="radio"
                     name="rating-4"
@@ -359,6 +467,14 @@
                   <input
                     type="radio"
                     name="rating-5"
+                    value={0}
+                    bind:group={value_for_money}
+                    class="mask mask-heart bg-red-400"
+                    hidden
+                  />
+                  <input
+                    type="radio"
+                    name="rating-5"
                     value={1}
                     bind:group={value_for_money}
                     class="mask mask-heart bg-red-400"
@@ -404,6 +520,14 @@
                   />
                 </div>
                 <div class="flex justify-between">
+                  <input
+                    type="radio"
+                    name="rating-6"
+                    value={0}
+                    bind:group={integrity}
+                    class="mask mask-heart bg-red-400"
+                    hidden
+                  />
                   <input
                     type="radio"
                     name="rating-6"
@@ -455,6 +579,14 @@
                   <input
                     type="radio"
                     name="rating-7"
+                    value={0}
+                    bind:group={assurance}
+                    class="mask mask-heart bg-red-400"
+                    hidden
+                  />
+                  <input
+                    type="radio"
+                    name="rating-7"
                     value={1}
                     bind:group={assurance}
                     class="mask mask-heart bg-red-400"
@@ -503,6 +635,14 @@
                   <input
                     type="radio"
                     name="rating-8"
+                    value={0}
+                    bind:group={outcome}
+                    class="mask mask-heart bg-red-400"
+                    hidden
+                  />
+                  <input
+                    type="radio"
+                    name="rating-8"
                     value={1}
                     bind:group={outcome}
                     class="mask mask-heart bg-red-400"
@@ -542,6 +682,14 @@
               >
                 <p class="text-xl font-bold">Overall Satisfaction Rating</p>
                 <div class="flex justify-between">
+                  <input
+                    type="radio"
+                    name="rating-9"
+                    value={0}
+                    bind:group={overall_satisfaction}
+                    class="mask mask-heart bg-red-400"
+                    hidden
+                  />
                   <input
                     type="radio"
                     name="rating-9"

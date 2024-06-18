@@ -1,5 +1,7 @@
 use crate::utils::auth::models::User;
 use sqlx::{migrate::MigrateDatabase, Sqlite, SqlitePool};
+use tokio::runtime::Runtime;
+
 const DB_URL: &str = "sqlite://sqlite.db";
 
 async fn get_db_connection() -> Result<sqlx::Pool<Sqlite>, sqlx::Error> {
@@ -27,6 +29,31 @@ pub async fn init() {
     .execute(&db)
     .await
     .unwrap();
+
+    // INFO: create trad_feedback_data table
+    let _result = sqlx::query(
+        "CREATE TABLE IF NOT EXISTS trad_feedback_data (
+                id         INTEGER PRIMARY KEY AUTOINCREMENT,
+                data       TEXT NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );",
+    )
+    .execute(&db)
+    .await
+    .unwrap();
+
+    // INFO: create hybrid_feedback_data table
+    let _result = sqlx::query(
+        "CREATE TABLE IF NOT EXISTS hybrid_feedback_data (
+                id         INTEGER PRIMARY KEY AUTOINCREMENT,
+                data       TEXT NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );",
+    )
+    .execute(&db)
+    .await
+    .unwrap();
+
     // INFO: we will now check if any user exists
     let user_results = sqlx::query_as::<_, User>("SELECT * FROM users")
         .fetch_all(&db)
@@ -72,4 +99,43 @@ pub async fn get_user(email: &str) -> Option<User> {
     // NOTE: emails has UNIQUE constraint so we can safely
     // return a clone of the first result
     Some(user_results[0].clone())
+}
+
+pub async fn save_trad_feedback(data: &str) -> bool {
+    let db = get_db_connection().await.unwrap();
+    let result = sqlx::query("INSERT INTO trad_feedback_data (data) VALUES (?)")
+        .bind(data)
+        .execute(&db)
+        .await;
+    match result {
+        Ok(res) => res.rows_affected() == 1,
+        Err(_) => false,
+    }
+}
+
+pub async fn save_hybrid_feedback(data: &str) -> bool {
+    let db = get_db_connection().await.unwrap();
+    let result = sqlx::query("INSERT INTO hybrid_feedback_data (data) VALUES (?)")
+        .bind(data)
+        .execute(&db)
+        .await;
+    match result {
+        Ok(res) => res.rows_affected() == 1,
+        Err(_) => false,
+    }
+}
+
+pub fn save_hybrid_feedback_sync(data: &str) -> bool {
+    let rt = Runtime::new().unwrap();
+    rt.block_on(async {
+        let db = get_db_connection().await.unwrap();
+        let result = sqlx::query("INSERT INTO hybrid_feedback_data (data) VALUES (?)")
+            .bind(data)
+            .execute(&db)
+            .await;
+        match result {
+            Ok(res) => res.rows_affected() == 1,
+            Err(_) => false,
+        }
+    })
 }
