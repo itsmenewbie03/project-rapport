@@ -1,5 +1,5 @@
 use crate::utils::db;
-use std::{fs::File, io::Write};
+use std::{collections::HashMap, fs::File, io::Write};
 pub enum FeedbackType {
     Trad,
     Hybrid,
@@ -15,6 +15,12 @@ pub struct FeedbackData {
     pub assurance: u8,
     pub outcome: u8,
     pub overall_satisfaction: u8,
+}
+
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct HybridFeedbackData {
+    pub feedback_data: FeedbackData,
+    pub emotion_data: HashMap<String, String>,
 }
 
 impl FeedbackData {
