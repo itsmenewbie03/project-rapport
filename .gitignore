@@ -11,3 +11,4 @@ vite.config.ts.timestamp-*
 sqlite.db*
 pyrightconfig.json
 start_pybackend.sh
+*.png

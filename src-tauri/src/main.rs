@@ -9,7 +9,11 @@ use utils::db;
 use utils::jwt;
 use utils::jwt::Claims;
 
-use crate::utils::{faau, feedback::FeedbackData, recorder};
+use crate::utils::{
+    faau,
+    feedback::{FeedbackData, FeedbackType, HybridFeedbackData},
+    recorder,
+};
 
 #[tauri::command]
 async fn authenticate(email: &str, password: &str) -> Result<Option<String>, ()> {
@@ -60,7 +64,7 @@ async fn get_session(token: Option<&str>) -> Result<Option<UserData>, ()> {
 async fn start_face_recording(id: &str) -> Result<String, String> {
     // NOTE: for now we just say every thing succeds
     println!("[RUST]: recording started for feedback_id: {}", id);
-    match recorder::start(id).await {
+    match faau::start(id).await {
         Ok(res) => Ok(res),
         Err(err) => {
             // NOTE: we can warn the user about the error
@@ -71,8 +75,25 @@ async fn start_face_recording(id: &str) -> Result<String, String> {
 }
 
 #[tauri::command]
-async fn submit_feedback(id: &str, feedback: &str) -> Result<String, String> {
-    recorder::stop().await;
+async fn take_photo(id: &str, quality: &str) -> Result<String, String> {
+    println!("[RUST]: take photo for {} for feedback {}", quality, id);
+    match faau::capture(id, quality).await {
+        Ok(res) => Ok(res),
+        Err(err) => {
+            // NOTE: we can warn the user about the error
+            utils::notifications::warn(&err);
+            Err(err)
+        }
+    }
+}
+
+#[tauri::command]
+async fn submit_feedback(
+    id: &str,
+    feedback: &str,
+    emotion: Option<String>,
+    recording: bool,
+) -> Result<String, String> {
     let feedback_data = FeedbackData::parse(feedback);
     match feedback_data {
         Ok(feedback_data) => {
@@ -81,8 +102,23 @@ async fn submit_feedback(id: &str, feedback: &str) -> Result<String, String> {
                 id, feedback_data
             );
             // BUG: handle the Err variant
-            faau::start(id).await.unwrap();
-            feedback_data.save(id);
+            if !recording {
+                // NOTE: when the user did not allowed recording
+                // we have nothing lef to do but store the feedback data
+                feedback_data.save_to_db(FeedbackType::Trad).await;
+                return Ok("Feedback submitted successfully".to_owned());
+            };
+            // INFO: we will only need to stop recording
+            // and start faau if the user allowed recording
+            recorder::stop().await;
+            if let Some(emotion) = emotion {
+                let hybrid_feedback_data = HybridFeedbackData {
+                    feedback_data,
+                    emotion_data: serde_json::from_str(&emotion).unwrap(),
+                };
+                db::save_hybrid_feedback(&serde_json::to_string(&hybrid_feedback_data).unwrap())
+                    .await;
+            }
             Ok("Feedback submitted successfully".to_owned())
         }
         Err(e) => {
@@ -104,7 +140,8 @@ fn main() {
             get_session,
             start_face_recording,
             submit_feedback,
-            clear_recording
+            clear_recording,
+            take_photo
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

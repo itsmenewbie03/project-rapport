@@ -1,4 +1,9 @@
-use std::{fs::File, io::Write};
+use crate::utils::db;
+use std::{collections::HashMap, fs::File, io::Write};
+pub enum FeedbackType {
+    Trad,
+    Hybrid,
+}
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct FeedbackData {
     pub responsiveness: u8,
@@ -12,6 +17,12 @@ pub struct FeedbackData {
     pub overall_satisfaction: u8,
 }
 
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct HybridFeedbackData {
+    pub feedback_data: FeedbackData,
+    pub emotion_data: HashMap<String, String>,
+}
+
 impl FeedbackData {
     pub fn parse(data: &str) -> Result<Self, String> {
         match serde_json::from_str(data) {
@@ -19,12 +30,19 @@ impl FeedbackData {
             Err(e) => Err(e.to_string()),
         }
     }
-    pub fn save(&self, id: &str) {
+    pub fn save_as_json(&self, id: &str) {
         let mut file =
             File::create(format!("{}_feedback.json", id)).expect("Failed to create a file!");
         let feedback_data =
             serde_json::to_string(self).expect("Failed to convert feedback data to json");
         file.write_all(feedback_data.as_bytes())
             .expect("Failed to write feedback data to file");
+    }
+    pub async fn save_to_db(&self, feedback_type: FeedbackType) -> bool {
+        let data = serde_json::to_string(self).unwrap();
+        match feedback_type {
+            FeedbackType::Trad => db::save_trad_feedback(&data).await,
+            FeedbackType::Hybrid => db::save_hybrid_feedback(&data).await,
+        }
     }
 }

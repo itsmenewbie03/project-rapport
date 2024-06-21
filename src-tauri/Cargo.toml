@@ -17,13 +17,17 @@ tauri-build = { version = "1.5.2", features = [] }
 [dependencies]
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "1.6.4", features = [ "dialog-confirm", "notification"] }
+tauri = { version = "1.6.4", features = [
+  "dialog-message",
+  "dialog-confirm",
+  "notification",
+] }
 sqlx = { version = "0.7.4", features = ["runtime-tokio-native-tls", "sqlite"] }
 tokio = { version = "1.38.0", features = ["macros"] }
 bcrypt = "0.15.1"
 jsonwebtoken = { version = "9", default-features = false }
 dotenv = "0.15.0"
-reqwest = { version = "0.12", features = ["json"] }
+reqwest = { version = "0.12", features = ["json", "blocking"] }
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem and the built-in dev server is disabled.
