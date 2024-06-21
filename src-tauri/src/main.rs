@@ -3,8 +3,6 @@
 
 pub mod utils;
 
-use std::time::Duration;
-
 use utils::auth::is_credentials_valid;
 use utils::auth::models::UserData;
 use utils::db;
@@ -13,7 +11,7 @@ use utils::jwt::Claims;
 
 use crate::utils::{
     faau,
-    feedback::{FeedbackData, FeedbackType},
+    feedback::{FeedbackData, FeedbackType, HybridFeedbackData},
     recorder,
 };
 
@@ -90,7 +88,12 @@ async fn take_photo(id: &str, quality: &str) -> Result<String, String> {
 }
 
 #[tauri::command]
-async fn submit_feedback(id: &str, feedback: &str, recording: bool) -> Result<String, String> {
+async fn submit_feedback(
+    id: &str,
+    feedback: &str,
+    emotion: Option<String>,
+    recording: bool,
+) -> Result<String, String> {
     let feedback_data = FeedbackData::parse(feedback);
     match feedback_data {
         Ok(feedback_data) => {
@@ -108,25 +111,14 @@ async fn submit_feedback(id: &str, feedback: &str, recording: bool) -> Result<St
             // INFO: we will only need to stop recording
             // and start faau if the user allowed recording
             recorder::stop().await;
-            faau::start(id).await.unwrap();
-            feedback_data.save_as_json(id);
-            let id_clone = id.to_owned();
-            // NOTE: POLL the faau for the result
-            std::thread::spawn(move || loop {
-                println!("FUCK WE GOT SOME SHIT!");
-                let analysis_result = faau::poll(&id_clone);
-                match analysis_result {
-                    Ok(data) => {
-                        println!("[RUST]: Wow Data: {}", data);
-                        db::save_hybrid_feedback_sync(&data);
-                        break;
-                    }
-                    Err(err) => {
-                        println!("[RUST]: No Data: {} Continue waiting bitch", err);
-                        std::thread::sleep(Duration::from_secs(5));
-                    }
+            if let Some(emotion) = emotion {
+                let hybrid_feedback_data = HybridFeedbackData {
+                    feedback_data,
+                    emotion_data: serde_json::from_str(&emotion).unwrap(),
                 };
-            });
+                db::save_hybrid_feedback(&serde_json::to_string(&hybrid_feedback_data).unwrap())
+                    .await;
+            }
             Ok("Feedback submitted successfully".to_owned())
         }
         Err(e) => {
