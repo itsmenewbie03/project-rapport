@@ -62,9 +62,9 @@ class BackgroundAnalysis:
     def _run_analysis(self):
         global is_active
         while self.running:
+            ret, frame = self.cap.read()  # pyright: ignore
             if not self.capture_now:
                 continue
-            ret, frame = self.cap.read()  # pyright: ignore
             if not ret:
                 print(
                     f"[PYTHON]: Unable to capture frame from file {self.feedback_id}.mp4"
@@ -72,9 +72,13 @@ class BackgroundAnalysis:
                 self.running = False
                 break
 
+            print(
+                f"[PYTHON]: Analyzing frame because self.capture_now is {self.capture_now}"
+            )
             try:
                 res = analyze_frame(frame, self.debug)
             except:
+                print("[PYTHON]: Failed to detect face in _run_analysis")
                 continue
             frame_res.append(res[0])
             print(res)
@@ -86,8 +90,6 @@ class BackgroundAnalysis:
         print(f"[PYTHON]: Time taken: {end - start} seconds")  # pyright: ignore
         print("[PYTHON]: Analysis thread stopped")
         print(f"[PYTHON]: Total frames analyzed: {len(frame_res)}")
-        open(f"{self.feedback_id}_frame_data.json", "w").write(json.dumps(frame_res))
-        aggregate(self.feedback_id, self.debug)
         frame_res.clear()
 
     def capture_frame(self):
@@ -166,6 +168,17 @@ def start_analysis(feedback_id, debug):
         return False
     analyzer = BackgroundAnalysis(feedback_id, debug)
     analyzer.start_analysis()
+    return True
+
+
+def stop_analysis():
+    global analyzer
+    global is_active
+    if not analyzer or not is_active:
+        return False
+    analyzer.stop_analysis()
+    analyzer = None
+    is_active = False
     return True
 
 
