@@ -87,7 +87,9 @@
         await take_photo("overall_satisfaction");
       }
     })();
-
+  // NOTE:
+  // key: quality, value: dominant_emotion
+  const emotion_data: Record<string, string> = {};
   const submit = async (event: Event) => {
     event.preventDefault();
     const data = {
@@ -101,11 +103,28 @@
       outcome,
       overall_satisfaction,
     };
-    console.log(data);
+    // TODO: check for 0s in data
+    const non_rated = [];
+    for (let key in data) {
+      // @ts-ignore
+      if (data[key] === 0) {
+        non_rated.push(key);
+      }
+    }
+    if (non_rated.length > 0) {
+      toast.error(`Please rate the following: ${non_rated.join(", ")}.`);
+      return;
+    }
     try {
+      console.log(emotion_data);
+      console.log(data);
       const response: any = await invoke("submit_feedback", {
         id: uuid,
         feedback: JSON.stringify(data),
+        emotion:
+          Object.keys(emotion_data).length && recording
+            ? JSON.stringify(emotion_data)
+            : null,
         recording: recording,
       });
       toast.success(
@@ -121,10 +140,23 @@
   };
 
   const take_photo = async (quality: string) => {
-    await invoke("take_photo", {
-      id: uuid,
-      quality: quality,
-    });
+    if (!recording) return;
+    try {
+      const frame_data: string = await invoke("take_photo", {
+        id: uuid,
+        quality: quality,
+      });
+      // NOTE: the frame_data we recieve is a JSON string
+      // we need to parse it in the client side
+      // as we will need an extra struct just for parsing
+      // to do it in the server
+      const frame = JSON.parse(frame_data);
+      // INFO: store the dominant emotion
+      emotion_data[quality] = frame.dominant_emotion;
+    } catch (err) {
+      // BUG: for debug we will just toast error the bug
+      toast.error("There was an error taking the photo.");
+    }
   };
 
   onMount(async () => {
