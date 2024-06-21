@@ -66,7 +66,7 @@ def poll_analysis():
 
 @app.route("/stop_recording")
 def stop_recording():
-    is_stopped = recorder.stop_capture()
+    is_stopped = faau.stop_analysis()
     if not is_stopped:
         return "Not recording", 400
     return "Recording stopped successfully"
