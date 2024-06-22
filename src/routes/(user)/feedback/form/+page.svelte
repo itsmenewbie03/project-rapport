@@ -2,18 +2,23 @@
   import UserLayout from "$components/UserLayout.svelte";
   import LoadingBars from "$components/LoadingBars.svelte";
   import QuickTip from "$components/QuickTip.svelte";
+  import ThankYouModal from "$components/ThankYouModal.svelte";
   import toast from "svelte-french-toast";
   import { page } from "$app/stores";
   import { onMount } from "svelte";
   import { beforeNavigate, goto } from "$app/navigation";
   import { invoke } from "@tauri-apps/api/tauri";
-  import { confirm, message } from "@tauri-apps/api/dialog";
+  import { confirm } from "@tauri-apps/api/dialog";
   import { gen_uuid } from "$lib/uuids";
 
   let loaded: boolean = false;
   let uuid: string = "";
   let dont_stop: boolean = false;
   let recording: boolean = false;
+
+  // INFO: Thank You Modal Stuff
+  let modal_handle: any;
+  let message: string = "";
 
   // INFO: feedback data
   let responsiveness: number = 0;
@@ -115,6 +120,13 @@
       toast.error(`Please rate the following: ${non_rated.join(", ")}.`);
       return;
     }
+    // TODO: ensure all emotions are captured
+    if (Object.keys(emotion_data).length !== 9) {
+      toast.error(
+        "Oops, you are going too fast! Please click submit after a few seconds.",
+      );
+      return;
+    }
     try {
       console.log(emotion_data);
       console.log(data);
@@ -127,13 +139,13 @@
             : null,
         recording: recording,
       });
-      toast.success(
-        `Your feedback has been submitted successfully. ${recording ? "Recording is also stopped." : ""} You will be redirected back to the consent screen shortly.`,
-      );
+      message = `Your feedback has been submitted successfully. ${recording ? "Recording is also stopped." : ""} You will be redirected back to the consent screen shortly.`;
+      modal_handle.show();
       setTimeout(async () => {
+        modal_handle.hide();
         dont_stop = true;
         await goto("/feedback/consent");
-      }, 3000);
+      }, 4000);
     } catch (err: any) {
       toast.error(err);
     }
@@ -238,6 +250,7 @@
 </script>
 
 <UserLayout>
+  <ThankYouModal bind:this={modal_handle} {message} />
   <div class="flex flex-col h-[calc(100vh-144px)]">
     {#if loaded}
       {#if $page.data.session}
