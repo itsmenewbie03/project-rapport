@@ -79,7 +79,7 @@ def clear_recording():
     if not fname:
         return "Missing Required Params", 400
     fname = f"{fname}.mp4"
-    is_cleared = recorder.clear_capture(fname)
+    is_cleared = faau.stop_analysis()
     if not is_cleared:
         return "Failed to clear recording", 400
     return "Recording cleared successfully"
