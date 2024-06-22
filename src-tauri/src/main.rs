@@ -3,6 +3,8 @@
 
 pub mod utils;
 
+use std::collections::HashMap;
+
 use utils::auth::is_credentials_valid;
 use utils::auth::models::UserData;
 use utils::db;
@@ -12,6 +14,7 @@ use utils::jwt::Claims;
 use crate::utils::{
     faau,
     feedback::{FeedbackData, FeedbackType, HybridFeedbackData},
+    models::ConfigData,
     recorder,
 };
 
@@ -127,10 +130,28 @@ async fn submit_feedback(
         }
     }
 }
+
 #[tauri::command]
 async fn clear_recording(id: &str) -> Result<String, String> {
     recorder::clear(id).await;
     Ok("Recording cleared!".to_owned())
+}
+
+#[tauri::command]
+async fn get_configs() -> Result<Vec<ConfigData>, String> {
+    match db::get_configs().await {
+        Some(configs) => Ok(configs),
+        None => Err("No configs set yet!".to_owned()),
+    }
+}
+
+#[tauri::command]
+async fn save_configs(data: HashMap<String, String>) -> Result<String, String> {
+    if db::save_configs(data).await {
+        Ok("Config saved successfully".to_owned())
+    } else {
+        Err("Failed to save config".to_owned())
+    }
 }
 
 fn main() {
@@ -141,6 +162,8 @@ fn main() {
             start_face_recording,
             submit_feedback,
             clear_recording,
+            get_configs,
+            save_configs,
             take_photo
         ])
         .run(tauri::generate_context!())

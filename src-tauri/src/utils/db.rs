@@ -1,4 +1,6 @@
-use crate::utils::auth::models::User;
+use std::collections::HashMap;
+
+use crate::utils::{auth::models::User, models::ConfigData};
 use sqlx::{migrate::MigrateDatabase, Sqlite, SqlitePool};
 use tokio::runtime::Runtime;
 
@@ -54,6 +56,18 @@ pub async fn init() {
     .await
     .unwrap();
 
+    // INFO: create configs table
+    let _result = sqlx::query(
+        "CREATE TABLE IF NOT EXISTS configs (
+                id    INTEGER PRIMARY KEY AUTOINCREMENT,
+                name  TEXT NOT NULL UNIQUE,
+                value TEXT
+        );",
+    )
+    .execute(&db)
+    .await
+    .unwrap();
+
     // INFO: we will now check if any user exists
     let user_results = sqlx::query_as::<_, User>("SELECT * FROM users")
         .fetch_all(&db)
@@ -99,6 +113,33 @@ pub async fn get_user(email: &str) -> Option<User> {
     // NOTE: emails has UNIQUE constraint so we can safely
     // return a clone of the first result
     Some(user_results[0].clone())
+}
+
+pub async fn get_configs() -> Option<Vec<ConfigData>> {
+    let db = get_db_connection().await.unwrap();
+    let configs = sqlx::query_as::<_, ConfigData>("SELECT * FROM configs;")
+        .fetch_all(&db)
+        .await
+        .unwrap();
+    if configs.is_empty() {
+        return None;
+    }
+    Some(configs)
+}
+
+pub async fn save_configs(config: HashMap<String, String>) -> bool {
+    let db = get_db_connection().await.unwrap();
+    for (key, value) in config.iter() {
+        let result = sqlx::query("INSERT OR REPLACE INTO configs (name, value) VALUES (?, ?)")
+            .bind(key)
+            .bind(value)
+            .execute(&db)
+            .await;
+        if result.is_err() {
+            return false;
+        }
+    }
+    true
 }
 
 pub async fn save_trad_feedback(data: &str) -> bool {
