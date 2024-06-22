@@ -4,5 +4,6 @@ pub mod encryption;
 pub mod faau;
 pub mod feedback;
 pub mod jwt;
+pub mod models;
 pub mod notifications;
 pub mod recorder;
