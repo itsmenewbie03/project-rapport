@@ -154,6 +154,28 @@ async fn save_configs(data: HashMap<String, String>) -> Result<String, String> {
     }
 }
 
+#[tauri::command]
+async fn update_profile(email: &str, data: HashMap<String, String>) -> Result<String, String> {
+    if db::update_profile(email, data).await {
+        Ok("Profile updated successfully. Please login again to refresh session!".to_owned())
+    } else {
+        Err("Failed to update profile".to_owned())
+    }
+}
+
+#[tauri::command]
+async fn change_password(email: &str, current: &str, new: &str) -> Result<String, String> {
+    if is_credentials_valid(email, current).await {
+        if db::change_password(email, new).await {
+            Ok("Password changed successfully. Please login again to refresh session!".to_owned())
+        } else {
+            Err("Failed to change password".to_owned())
+        }
+    } else {
+        Err("The current password provided is incorrect.".to_owned())
+    }
+}
+
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
@@ -164,7 +186,9 @@ fn main() {
             clear_recording,
             get_configs,
             save_configs,
-            take_photo
+            take_photo,
+            update_profile,
+            change_password
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

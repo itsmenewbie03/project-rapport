@@ -28,8 +28,24 @@
       toast.error("Name must be at least 3 characters.");
       return;
     }
-    // BUG: profile update is not yet implemented in Rust backend
-    toast.success("Profile updated successfully.");
+    const update_data = {
+      email,
+      name,
+    };
+    try {
+      const resp: string = await invoke("update_profile", {
+        email: $page.data.session.email,
+        data: update_data,
+      });
+      toast.success(resp);
+      // TODO: require re-login after profile update
+      localStorage.removeItem("auth_token");
+      setTimeout(() => {
+        goto("/login");
+      }, 2000);
+    } catch (err: any) {
+      toast.error(err);
+    }
   };
 
   const update_password = async (event: Event) => {
@@ -47,8 +63,21 @@
       toast.error("New password and confirm password must match.");
       return;
     }
-    // BUG: password change is not yet implemented in Rust backend
-    toast.success("Password updated successfully.");
+    try {
+      const resp: string = await invoke("change_password", {
+        email: $page.data.session.email,
+        current: current_password,
+        new: new_password,
+      });
+      toast.success(resp);
+      // TODO: require re-login after profile update
+      localStorage.removeItem("auth_token");
+      setTimeout(() => {
+        goto("/login");
+      }, 2000);
+    } catch (err: any) {
+      toast.error(err);
+    }
   };
 
   onMount(async () => {

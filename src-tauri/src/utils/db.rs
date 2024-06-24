@@ -142,6 +142,43 @@ pub async fn save_configs(config: HashMap<String, String>) -> bool {
     true
 }
 
+pub async fn update_profile(email: &str, data: HashMap<String, String>) -> bool {
+    let db = get_db_connection().await.unwrap();
+    let user = get_user(email).await;
+    match user {
+        Some(_) => {
+            let mut update_data: Vec<String> = vec![];
+            data.iter().for_each(|(key, value)| {
+                update_data.push(format!("{} = '{}'", key, value));
+            });
+            let query = format!(
+                "UPDATE users SET {} WHERE email = (?)",
+                update_data.join(", "),
+            );
+            let result = sqlx::query(&query).bind(email).execute(&db).await;
+            match result {
+                Ok(res) => res.rows_affected() == 1,
+                Err(_) => false,
+            }
+        }
+        None => false,
+    }
+}
+
+pub async fn change_password(email: &str, new_password: &str) -> bool {
+    let db = get_db_connection().await.unwrap();
+    let password_hash = bcrypt::hash(new_password, 10).unwrap();
+    let result = sqlx::query("UPDATE users SET password = (?) WHERE email = (?)")
+        .bind(password_hash)
+        .bind(email)
+        .execute(&db)
+        .await;
+    match result {
+        Ok(res) => res.rows_affected() == 1,
+        Err(_) => false,
+    }
+}
+
 pub async fn save_trad_feedback(data: &str) -> bool {
     let db = get_db_connection().await.unwrap();
     let result = sqlx::query("INSERT INTO trad_feedback_data (data) VALUES (?)")
