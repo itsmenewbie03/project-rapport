@@ -13,10 +13,10 @@
     <slot />
   </main>
   <footer
-    class="footer footer-center p-4 bg-base-300 text-base-content absolute inset-x-0 bottom-0"
+    class="footer footer-center p-4 bg-base-300 text-base-content fixed inset-x-0 bottom-0"
   >
     <aside>
-      <p>Project Rapport - Copyright © 2024</p>
+      <p>Project Rapport - Copyright © {new Date().getFullYear()}</p>
     </aside>
   </footer>
 </div>
