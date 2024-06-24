@@ -6,6 +6,7 @@
   import { goto } from "$app/navigation";
   import toast from "svelte-french-toast";
   import { invoke } from "@tauri-apps/api/tauri";
+  import { validate_email as is_valid_email } from "$lib/email_validator";
   let loaded: boolean = false;
 
   let max_negative_feedback: number = 3;
@@ -17,6 +18,10 @@
   };
 
   const save = async (event: Event) => {
+    if (!is_valid_email(email_recipient)) {
+      toast.error("Invalid email address.");
+      return;
+    }
     const config_data = {
       // NOTE: we won't do dyn in rust to JS will adjust xD
       max_negative_feedback: max_negative_feedback.toString(),
