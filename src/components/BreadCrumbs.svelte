@@ -1,6 +1,5 @@
 <script lang="ts">
   import { page } from "$app/stores";
-  import { path } from "@tauri-apps/api";
   import Icon from "./Icon.svelte";
   let paths = $page.url.pathname.split("/");
   paths.shift();
