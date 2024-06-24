@@ -6,6 +6,7 @@
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import toast from "svelte-french-toast";
+  import Stats from "$components/Stats.svelte";
   let loaded: boolean = false;
 
   onMount(async () => {
@@ -25,7 +26,10 @@
     {#if loaded}
       {#if $page.data.session}
         <div class="px-14 py-4">
-          <DashboardQuickMenu />
+          <div class="flex flex-row gap-6">
+            <DashboardQuickMenu />
+            <Stats />
+          </div>
         </div>
       {:else}
         <h1>Access Denied</h1>
