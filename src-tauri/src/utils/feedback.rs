@@ -1,9 +1,21 @@
 use crate::utils::db;
 use std::{collections::HashMap, fs::File, io::Write};
+
 pub enum FeedbackType {
     Trad,
     Hybrid,
 }
+
+impl FeedbackType {
+    pub fn parse(data: &str) -> Result<Self, String> {
+        match data {
+            "trad" => Ok(FeedbackType::Trad),
+            "hybrid" => Ok(FeedbackType::Hybrid),
+            _ => Err("Invalid feedback type".to_string()),
+        }
+    }
+}
+
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct FeedbackData {
     pub responsiveness: u8,

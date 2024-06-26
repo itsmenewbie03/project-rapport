@@ -1,6 +1,10 @@
 use std::collections::HashMap;
 
-use crate::utils::{auth::models::User, models::ConfigData};
+use crate::utils::{
+    auth::models::User,
+    feedback::FeedbackType,
+    models::{ConfigData, FeedbackDataRow},
+};
 use sqlx::{migrate::MigrateDatabase, Sqlite, SqlitePool};
 use tokio::runtime::Runtime;
 
@@ -216,4 +220,21 @@ pub fn save_hybrid_feedback_sync(data: &str) -> bool {
             Err(_) => false,
         }
     })
+}
+
+pub async fn get_feedbacks(feedback_type: FeedbackType) -> Option<Vec<FeedbackDataRow>> {
+    let table = match feedback_type {
+        FeedbackType::Trad => "trad_feedback_data",
+        FeedbackType::Hybrid => "hybrid_feedback_data",
+    };
+    let db = get_db_connection().await.unwrap();
+    let query = format!("SELECT * FROM {}", table);
+    let feedbacks = sqlx::query_as::<_, FeedbackDataRow>(&query)
+        .fetch_all(&db)
+        .await
+        .unwrap();
+    if feedbacks.is_empty() {
+        return None;
+    }
+    Some(feedbacks)
 }
