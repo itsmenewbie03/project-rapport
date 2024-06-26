@@ -176,6 +176,20 @@ async fn change_password(email: &str, current: &str, new: &str) -> Result<String
     }
 }
 
+#[tauri::command]
+async fn get_feedbacks(class: &str) -> Result<String, String> {
+    let feedback_type = FeedbackType::parse(class);
+    match feedback_type {
+        Ok(feedback_type) => {
+            let feedbacks = db::get_feedbacks(feedback_type).await;
+            match feedbacks {
+                Some(feedbacks) => Ok(serde_json::to_string(&feedbacks).unwrap()),
+                None => Err("No feedbacks found!".to_owned()),
+            }
+        }
+        Err(e) => Err(e),
+    }
+}
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
@@ -188,7 +202,8 @@ fn main() {
             save_configs,
             take_photo,
             update_profile,
-            change_password
+            change_password,
+            get_feedbacks
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
