@@ -288,7 +288,7 @@
                     name="rating-1"
                     value={0}
                     bind:group={responsiveness}
-                    class="mask mask-heart bg-red-400"
+                    class={`mask mask-heart bg-red-400 ${responsiveness == 0 ? "" : "bg-opacity-20"}`}
                     hidden
                   />
                   <input
@@ -296,35 +296,35 @@
                     name="rating-1"
                     value={1}
                     bind:group={responsiveness}
-                    class="mask mask-heart bg-red-400"
+                    class={`mask mask-heart bg-red-400 ${responsiveness == 1 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-1"
                     value={2}
                     bind:group={responsiveness}
-                    class="mask mask-heart bg-orange-400"
+                    class={`mask mask-heart bg-orange-400 ${responsiveness == 2 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-1"
                     value={3}
                     bind:group={responsiveness}
-                    class="mask mask-heart bg-yellow-400"
+                    class={`mask mask-heart bg-yellow-400 ${responsiveness == 3 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-1"
                     value={4}
                     bind:group={responsiveness}
-                    class="mask mask-heart bg-lime-400"
+                    class={`mask mask-heart bg-lime-400 ${responsiveness == 4 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-1"
                     value={5}
                     bind:group={responsiveness}
-                    class="mask mask-heart bg-green-400"
+                    class={`mask mask-heart bg-green-400 ${responsiveness == 5 ? "" : "bg-opacity-20"}`}
                   />
                 </div>
               </div>
@@ -344,7 +344,7 @@
                     name="rating-2"
                     value={0}
                     bind:group={reliability}
-                    class="mask mask-heart bg-red-400"
+                    class={`mask mask-heart bg-red-400 ${reliability == 0 ? "" : "bg-opacity-20"}`}
                     hidden
                   />
                   <input
@@ -352,35 +352,35 @@
                     name="rating-2"
                     value={1}
                     bind:group={reliability}
-                    class="mask mask-heart bg-red-400"
+                    class={`mask mask-heart bg-red-400 ${reliability == 1 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-2"
                     value={2}
                     bind:group={reliability}
-                    class="mask mask-heart bg-orange-400"
+                    class={`mask mask-heart bg-orange-400 ${reliability == 2 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-2"
                     value={3}
                     bind:group={reliability}
-                    class="mask mask-heart bg-yellow-400"
+                    class={`mask mask-heart bg-yellow-400 ${reliability == 3 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-2"
                     value={4}
                     bind:group={reliability}
-                    class="mask mask-heart bg-lime-400"
+                    class={`mask mask-heart bg-lime-400 ${reliability == 4 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-2"
                     value={5}
                     bind:group={reliability}
-                    class="mask mask-heart bg-green-400"
+                    class={`mask mask-heart bg-green-400 ${reliability == 5 ? "" : "bg-opacity-20"}`}
                   />
                 </div>
               </div>
@@ -400,7 +400,7 @@
                     name="rating-3"
                     value={0}
                     bind:group={access_and_facilities}
-                    class="mask mask-heart bg-red-400"
+                    class={`mask mask-heart bg-red-400 ${access_and_facilities == 0 ? "" : "bg-opacity-20"}`}
                     hidden
                   />
                   <input
@@ -408,35 +408,35 @@
                     name="rating-3"
                     value={1}
                     bind:group={access_and_facilities}
-                    class="mask mask-heart bg-red-400"
+                    class={`mask mask-heart bg-red-400 ${access_and_facilities == 1 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-3"
                     value={2}
                     bind:group={access_and_facilities}
-                    class="mask mask-heart bg-orange-400"
+                    class={`mask mask-heart bg-orange-400 ${access_and_facilities == 2 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-3"
                     value={3}
                     bind:group={access_and_facilities}
-                    class="mask mask-heart bg-yellow-400"
+                    class={`mask mask-heart bg-yellow-400 ${access_and_facilities == 3 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-3"
                     value={4}
                     bind:group={access_and_facilities}
-                    class="mask mask-heart bg-lime-400"
+                    class={`mask mask-heart bg-lime-400 ${access_and_facilities == 4 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-3"
                     value={5}
                     bind:group={access_and_facilities}
-                    class="mask mask-heart bg-green-400"
+                    class={`mask mask-heart bg-green-400 ${access_and_facilities == 5 ? "" : "bg-opacity-20"}`}
                   />
                 </div>
               </div>
@@ -456,7 +456,7 @@
                     name="rating-4"
                     value={0}
                     bind:group={communication}
-                    class="mask mask-heart bg-red-400"
+                    class={`mask mask-heart bg-red-400 ${communication == 0 ? "" : "bg-opacity-20"}`}
                     hidden
                   />
                   <input
@@ -464,35 +464,35 @@
                     name="rating-4"
                     value={1}
                     bind:group={communication}
-                    class="mask mask-heart bg-red-400"
+                    class={`mask mask-heart bg-red-400 ${communication == 1 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-4"
                     value={2}
                     bind:group={communication}
-                    class="mask mask-heart bg-orange-400"
+                    class={`mask mask-heart bg-orange-400 ${communication == 2 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-4"
                     value={3}
                     bind:group={communication}
-                    class="mask mask-heart bg-yellow-400"
+                    class={`mask mask-heart bg-yellow-400 ${communication == 3 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-4"
                     value={4}
                     bind:group={communication}
-                    class="mask mask-heart bg-lime-400"
+                    class={`mask mask-heart bg-lime-400 ${communication == 4 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-4"
                     value={5}
                     bind:group={communication}
-                    class="mask mask-heart bg-green-400"
+                    class={`mask mask-heart bg-green-400 ${communication == 5 ? "" : "bg-opacity-20"}`}
                   />
                 </div>
               </div>
@@ -514,7 +514,7 @@
                     name="rating-5"
                     value={0}
                     bind:group={value_for_money}
-                    class="mask mask-heart bg-red-400"
+                    class={`mask mask-heart bg-red-400 ${value_for_money == 0 ? "" : "bg-opacity-20"}`}
                     hidden
                   />
                   <input
@@ -522,35 +522,35 @@
                     name="rating-5"
                     value={1}
                     bind:group={value_for_money}
-                    class="mask mask-heart bg-red-400"
+                    class={`mask mask-heart bg-red-400 ${value_for_money == 1 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-5"
                     value={2}
                     bind:group={value_for_money}
-                    class="mask mask-heart bg-orange-400"
+                    class={`mask mask-heart bg-orange-400 ${value_for_money == 2 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-5"
                     value={3}
                     bind:group={value_for_money}
-                    class="mask mask-heart bg-yellow-400"
+                    class={`mask mask-heart bg-yellow-400 ${value_for_money == 3 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-5"
                     value={4}
                     bind:group={value_for_money}
-                    class="mask mask-heart bg-lime-400"
+                    class={`mask mask-heart bg-lime-400 ${value_for_money == 4 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-5"
                     value={5}
                     bind:group={value_for_money}
-                    class="mask mask-heart bg-green-400"
+                    class={`mask mask-heart bg-green-400 ${value_for_money == 5 ? "" : "bg-opacity-20"}`}
                   />
                 </div>
               </div>
@@ -570,7 +570,7 @@
                     name="rating-6"
                     value={0}
                     bind:group={integrity}
-                    class="mask mask-heart bg-red-400"
+                    class={`mask mask-heart bg-red-400 ${integrity == 0 ? "" : "bg-opacity-20"}`}
                     hidden
                   />
                   <input
@@ -578,35 +578,35 @@
                     name="rating-6"
                     value={1}
                     bind:group={integrity}
-                    class="mask mask-heart bg-red-400"
+                    class={`mask mask-heart bg-red-400 ${integrity == 1 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-6"
                     value={2}
                     bind:group={integrity}
-                    class="mask mask-heart bg-orange-400"
+                    class={`mask mask-heart bg-orange-400 ${integrity == 2 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-6"
                     value={3}
                     bind:group={integrity}
-                    class="mask mask-heart bg-yellow-400"
+                    class={`mask mask-heart bg-yellow-400 ${integrity == 3 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-6"
                     value={4}
                     bind:group={integrity}
-                    class="mask mask-heart bg-lime-400"
+                    class={`mask mask-heart bg-lime-400 ${integrity == 4 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-6"
                     value={5}
                     bind:group={integrity}
-                    class="mask mask-heart bg-green-400"
+                    class={`mask mask-heart bg-green-400 ${integrity == 5 ? "" : "bg-opacity-20"}`}
                   />
                 </div>
               </div>
@@ -626,7 +626,7 @@
                     name="rating-7"
                     value={0}
                     bind:group={assurance}
-                    class="mask mask-heart bg-red-400"
+                    class={`mask mask-heart bg-red-400 ${assurance == 0 ? "" : "bg-opacity-20"}`}
                     hidden
                   />
                   <input
@@ -634,35 +634,35 @@
                     name="rating-7"
                     value={1}
                     bind:group={assurance}
-                    class="mask mask-heart bg-red-400"
+                    class={`mask mask-heart bg-red-400 ${assurance == 1 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-7"
                     value={2}
                     bind:group={assurance}
-                    class="mask mask-heart bg-orange-400"
+                    class={`mask mask-heart bg-orange-400 ${assurance == 2 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-7"
                     value={3}
                     bind:group={assurance}
-                    class="mask mask-heart bg-yellow-400"
+                    class={`mask mask-heart bg-yellow-400 ${assurance == 3 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-7"
                     value={4}
                     bind:group={assurance}
-                    class="mask mask-heart bg-lime-400"
+                    class={`mask mask-heart bg-lime-400 ${assurance == 4 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-7"
                     value={5}
                     bind:group={assurance}
-                    class="mask mask-heart bg-green-400"
+                    class={`mask mask-heart bg-green-400 ${assurance == 5 ? "" : "bg-opacity-20"}`}
                   />
                 </div>
               </div>
@@ -682,7 +682,7 @@
                     name="rating-8"
                     value={0}
                     bind:group={outcome}
-                    class="mask mask-heart bg-red-400"
+                    class={`mask mask-heart bg-red-400 ${outcome == 0 ? "" : "bg-opacity-20"}`}
                     hidden
                   />
                   <input
@@ -690,35 +690,35 @@
                     name="rating-8"
                     value={1}
                     bind:group={outcome}
-                    class="mask mask-heart bg-red-400"
+                    class={`mask mask-heart bg-red-400 ${outcome == 1 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-8"
                     value={2}
                     bind:group={outcome}
-                    class="mask mask-heart bg-orange-400"
+                    class={`mask mask-heart bg-orange-400 ${outcome == 2 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-8"
                     value={3}
                     bind:group={outcome}
-                    class="mask mask-heart bg-yellow-400"
+                    class={`mask mask-heart bg-yellow-400 ${outcome == 3 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-8"
                     value={4}
                     bind:group={outcome}
-                    class="mask mask-heart bg-lime-400"
+                    class={`mask mask-heart bg-lime-400 ${outcome == 4 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-8"
                     value={5}
                     bind:group={outcome}
-                    class="mask mask-heart bg-green-400"
+                    class={`mask mask-heart bg-green-400 ${outcome == 5 ? "" : "bg-opacity-20"}`}
                   />
                 </div>
               </div>
@@ -732,7 +732,7 @@
                     name="rating-9"
                     value={0}
                     bind:group={overall_satisfaction}
-                    class="mask mask-heart bg-red-400"
+                    class={`mask mask-heart bg-red-400 ${overall_satisfaction == 0 ? "" : "bg-opacity-20"}`}
                     hidden
                   />
                   <input
@@ -740,35 +740,35 @@
                     name="rating-9"
                     value={1}
                     bind:group={overall_satisfaction}
-                    class="mask mask-heart bg-red-400"
+                    class={`mask mask-heart bg-red-400 ${overall_satisfaction == 1 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-9"
                     value={2}
                     bind:group={overall_satisfaction}
-                    class="mask mask-heart bg-orange-400"
+                    class={`mask mask-heart bg-orange-400 ${overall_satisfaction == 2 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-9"
                     value={3}
                     bind:group={overall_satisfaction}
-                    class="mask mask-heart bg-yellow-400"
+                    class={`mask mask-heart bg-yellow-400 ${overall_satisfaction == 3 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-9"
                     value={4}
                     bind:group={overall_satisfaction}
-                    class="mask mask-heart bg-lime-400"
+                    class={`mask mask-heart bg-lime-400 ${overall_satisfaction == 4 ? "" : "bg-opacity-20"}`}
                   />
                   <input
                     type="radio"
                     name="rating-9"
                     value={5}
                     bind:group={overall_satisfaction}
-                    class="mask mask-heart bg-green-400"
+                    class={`mask mask-heart bg-green-400 ${overall_satisfaction == 5 ? "" : "bg-opacity-20"}`}
                   />
                 </div>
               </div>
