@@ -121,7 +121,7 @@
       return;
     }
     // TODO: ensure all emotions are captured
-    if (Object.keys(emotion_data).length !== 9) {
+    if (Object.keys(emotion_data).length !== 9 && recording) {
       toast.error(
         "Oops, you are going too fast! Please click submit after a few seconds.",
       );
