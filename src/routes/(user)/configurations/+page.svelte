@@ -71,7 +71,7 @@
           <label class="form-control w-full">
             <div class="label">
               <span class="label-text"
-                >Consecutive Negative Feedback Threshold</span
+                >Minimum Consecutive Negative Reviews for Alert</span
               >
             </div>
             <input
