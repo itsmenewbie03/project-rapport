@@ -16,6 +16,11 @@
   let dont_stop: boolean = false;
   let recording: boolean = false;
 
+  let client_type: string = "";
+  let other_client_type: string = "";
+  let purpose_of_visit: string = "";
+  let initial_step_done = false;
+
   // INFO: Thank You Modal Stuff
   let modal_handle: any;
   let message: string = "";
@@ -108,6 +113,10 @@
       outcome,
       overall_satisfaction,
     };
+    const metadata = {
+      client_type: client_type === "other" ? other_client_type : client_type,
+      purpose_of_visit,
+    };
     // TODO: check for 0s in data
     const non_rated = [];
     for (let key in data) {
@@ -134,9 +143,11 @@
         id: uuid,
         feedback: JSON.stringify(data),
         emotion:
+          // TODO: you see this crazy ternary? this is to make them confused xD
           Object.keys(emotion_data).length && recording
             ? JSON.stringify(emotion_data)
             : null,
+        metadata: JSON.stringify(metadata),
         recording: recording,
       });
       message = `Your feedback has been submitted successfully. ${recording ? "Recording is also stopped." : ""} You will be redirected back to the consent screen shortly.`;
@@ -149,6 +160,18 @@
     } catch (err: any) {
       toast.error(err);
     }
+  };
+
+  const initial_submit = async (event: Event) => {
+    if (
+      !client_type ||
+      !purpose_of_visit ||
+      (client_type === "other" && !other_client_type)
+    ) {
+      toast.error("Please fill out all the fields.");
+      return;
+    }
+    initial_step_done = true;
   };
 
   const take_photo = async (quality: string) => {
@@ -254,529 +277,567 @@
   <div class="flex flex-col h-[calc(100vh-144px)]">
     {#if loaded}
       {#if $page.data.session}
-        <!-- TODO: add feedback page content  -->
-
         <div class="px-14 py-4">
-          <div>
-            <div class="flex flex-inline items-center">
-              <p class="text-2xl font-bold">Tell us what you think!</p>
-              <QuickTip
-                title="Rating"
-                description="This feedback scale uses colors! Red means very unhappy, orange unhappy, yellow okay, lime happy, and green very happy."
+          {#if !client_type || !purpose_of_visit || !initial_step_done}
+            <p class="text-xl font-bold">I am a</p>
+            <select
+              class="select select-primary w-full max-w-xs mt-1"
+              bind:value={client_type}
+            >
+              <option disabled selected value="">Select an option</option>
+              <option value="student">Student</option>
+              <option value="parent">Parent</option>
+              <option value="teacher">Teacher</option>
+              <option value="visitor">Visitor</option>
+              <option value="government_employee">Government Employee</option>
+              <option value="other">Other</option>
+            </select>
+            {#if client_type == "other"}
+              <input
+                type="text"
+                placeholder="Please Specify"
+                bind:value={other_client_type}
+                class="input input-bordered w-full max-w-xs ml-4"
               />
+            {/if}
+            <p class="text-xl font-bold mt-4">Purpose of Visit</p>
+            <input
+              type="text"
+              placeholder="Enter your purpose of visit here..."
+              bind:value={purpose_of_visit}
+              class="input input-bordered w-full max-w-xs mt-1"
+            />
+            <div class="mt-4">
+              <button
+                class="btn btn-primary"
+                on:click={initial_submit}
+                disabled={!client_type ||
+                  !purpose_of_visit ||
+                  (client_type === "other" && !other_client_type)}>Next</button
+              >
             </div>
+          {:else}
+            <div>
+              <div class="flex flex-inline items-center">
+                <p class="text-2xl font-bold">Tell us what you think!</p>
+                <QuickTip
+                  title="Rating"
+                  description="This feedback scale uses colors! Red means very unhappy, orange unhappy, yellow okay, lime happy, and green very happy."
+                />
+              </div>
 
-            <p>
-              We greatly value your opinion. Please assess your experience with
-              our product or service by selecting the icons that corresponds to
-              your rating using the scale given below:
-            </p>
-            <div class="flex flex-col gap-y-1">
-              <div
-                class="rating rating-lg gap-8 grid grid-cols-2 flex-inline items-center"
-              >
-                <div class="flex flex-inline items-center">
-                  <p class="text-xl font-bold">Responsiveness</p>
-                  <QuickTip
-                    title="Responsiveness"
-                    description="The willingness to help, assist and provide prompt service to citizens/clients."
-                  />
+              <p>
+                We greatly value your opinion. Please assess your experience
+                with our product or service by selecting the icons that
+                corresponds to your rating using the scale given below:
+              </p>
+              <div class="flex flex-col gap-y-1">
+                <div
+                  class="rating rating-lg gap-8 grid grid-cols-2 flex-inline items-center"
+                >
+                  <div class="flex flex-inline items-center">
+                    <p class="text-xl font-bold">Responsiveness</p>
+                    <QuickTip
+                      title="Responsiveness"
+                      description="The willingness to help, assist and provide prompt service to citizens/clients."
+                    />
+                  </div>
+                  <div class="flex justify-between">
+                    <input
+                      type="radio"
+                      name="rating-1"
+                      value={0}
+                      bind:group={responsiveness}
+                      class={`mask mask-heart bg-red-400 ${responsiveness == 0 ? "" : "bg-opacity-20"}`}
+                      hidden
+                    />
+                    <input
+                      type="radio"
+                      name="rating-1"
+                      value={1}
+                      bind:group={responsiveness}
+                      class={`mask mask-heart bg-red-400 ${responsiveness == 1 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-1"
+                      value={2}
+                      bind:group={responsiveness}
+                      class={`mask mask-heart bg-orange-400 ${responsiveness == 2 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-1"
+                      value={3}
+                      bind:group={responsiveness}
+                      class={`mask mask-heart bg-yellow-400 ${responsiveness == 3 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-1"
+                      value={4}
+                      bind:group={responsiveness}
+                      class={`mask mask-heart bg-lime-400 ${responsiveness == 4 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-1"
+                      value={5}
+                      bind:group={responsiveness}
+                      class={`mask mask-heart bg-green-400 ${responsiveness == 5 ? "" : "bg-opacity-20"}`}
+                    />
+                  </div>
                 </div>
-                <div class="flex justify-between">
-                  <input
-                    type="radio"
-                    name="rating-1"
-                    value={0}
-                    bind:group={responsiveness}
-                    class={`mask mask-heart bg-red-400 ${responsiveness == 0 ? "" : "bg-opacity-20"}`}
-                    hidden
-                  />
-                  <input
-                    type="radio"
-                    name="rating-1"
-                    value={1}
-                    bind:group={responsiveness}
-                    class={`mask mask-heart bg-red-400 ${responsiveness == 1 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-1"
-                    value={2}
-                    bind:group={responsiveness}
-                    class={`mask mask-heart bg-orange-400 ${responsiveness == 2 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-1"
-                    value={3}
-                    bind:group={responsiveness}
-                    class={`mask mask-heart bg-yellow-400 ${responsiveness == 3 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-1"
-                    value={4}
-                    bind:group={responsiveness}
-                    class={`mask mask-heart bg-lime-400 ${responsiveness == 4 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-1"
-                    value={5}
-                    bind:group={responsiveness}
-                    class={`mask mask-heart bg-green-400 ${responsiveness == 5 ? "" : "bg-opacity-20"}`}
-                  />
+                <div
+                  class="rating rating-lg gap-8 grid grid-cols-2 flex-inline items-center"
+                >
+                  <div class="flex flex-inline items-center">
+                    <p class="text-xl font-bold">Reliability (Quality)</p>
+                    <QuickTip
+                      title="Reliability (Quality)"
+                      description="The provision of what is needed and what was promised, following the policy and standards, with zero to a minimal error rate"
+                    />
+                  </div>
+                  <div class="flex justify-between">
+                    <input
+                      type="radio"
+                      name="rating-2"
+                      value={0}
+                      bind:group={reliability}
+                      class={`mask mask-heart bg-red-400 ${reliability == 0 ? "" : "bg-opacity-20"}`}
+                      hidden
+                    />
+                    <input
+                      type="radio"
+                      name="rating-2"
+                      value={1}
+                      bind:group={reliability}
+                      class={`mask mask-heart bg-red-400 ${reliability == 1 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-2"
+                      value={2}
+                      bind:group={reliability}
+                      class={`mask mask-heart bg-orange-400 ${reliability == 2 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-2"
+                      value={3}
+                      bind:group={reliability}
+                      class={`mask mask-heart bg-yellow-400 ${reliability == 3 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-2"
+                      value={4}
+                      bind:group={reliability}
+                      class={`mask mask-heart bg-lime-400 ${reliability == 4 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-2"
+                      value={5}
+                      bind:group={reliability}
+                      class={`mask mask-heart bg-green-400 ${reliability == 5 ? "" : "bg-opacity-20"}`}
+                    />
+                  </div>
                 </div>
-              </div>
-              <div
-                class="rating rating-lg gap-8 grid grid-cols-2 flex-inline items-center"
-              >
-                <div class="flex flex-inline items-center">
-                  <p class="text-xl font-bold">Reliability (Quality)</p>
-                  <QuickTip
-                    title="Reliability (Quality)"
-                    description="The provision of what is needed and what was promised, following the policy and standards, with zero to a minimal error rate"
-                  />
+                <div
+                  class="rating rating-lg gap-8 grid grid-cols-2 flex-inline items-center"
+                >
+                  <div class="flex flex-inline items-center">
+                    <p class="text-xl font-bold">Access and Facilities</p>
+                    <QuickTip
+                      title="Access and Facilities"
+                      description="The convenience of location, ample amenities for comfortable transactions, use of clear signages and modes of technology."
+                    />
+                  </div>
+                  <div class="flex justify-between">
+                    <input
+                      type="radio"
+                      name="rating-3"
+                      value={0}
+                      bind:group={access_and_facilities}
+                      class={`mask mask-heart bg-red-400 ${access_and_facilities == 0 ? "" : "bg-opacity-20"}`}
+                      hidden
+                    />
+                    <input
+                      type="radio"
+                      name="rating-3"
+                      value={1}
+                      bind:group={access_and_facilities}
+                      class={`mask mask-heart bg-red-400 ${access_and_facilities == 1 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-3"
+                      value={2}
+                      bind:group={access_and_facilities}
+                      class={`mask mask-heart bg-orange-400 ${access_and_facilities == 2 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-3"
+                      value={3}
+                      bind:group={access_and_facilities}
+                      class={`mask mask-heart bg-yellow-400 ${access_and_facilities == 3 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-3"
+                      value={4}
+                      bind:group={access_and_facilities}
+                      class={`mask mask-heart bg-lime-400 ${access_and_facilities == 4 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-3"
+                      value={5}
+                      bind:group={access_and_facilities}
+                      class={`mask mask-heart bg-green-400 ${access_and_facilities == 5 ? "" : "bg-opacity-20"}`}
+                    />
+                  </div>
                 </div>
-                <div class="flex justify-between">
-                  <input
-                    type="radio"
-                    name="rating-2"
-                    value={0}
-                    bind:group={reliability}
-                    class={`mask mask-heart bg-red-400 ${reliability == 0 ? "" : "bg-opacity-20"}`}
-                    hidden
-                  />
-                  <input
-                    type="radio"
-                    name="rating-2"
-                    value={1}
-                    bind:group={reliability}
-                    class={`mask mask-heart bg-red-400 ${reliability == 1 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-2"
-                    value={2}
-                    bind:group={reliability}
-                    class={`mask mask-heart bg-orange-400 ${reliability == 2 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-2"
-                    value={3}
-                    bind:group={reliability}
-                    class={`mask mask-heart bg-yellow-400 ${reliability == 3 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-2"
-                    value={4}
-                    bind:group={reliability}
-                    class={`mask mask-heart bg-lime-400 ${reliability == 4 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-2"
-                    value={5}
-                    bind:group={reliability}
-                    class={`mask mask-heart bg-green-400 ${reliability == 5 ? "" : "bg-opacity-20"}`}
-                  />
+                <div
+                  class="rating rating-lg gap-8 grid grid-cols-2 flex-inline items-center"
+                >
+                  <div class="flex flex-inline items-center">
+                    <p class="text-xl font-bold">Communication</p>
+                    <QuickTip
+                      title="Communication"
+                      description="The act of keeping citizens and clients informed in a language they can easily understand, as well as listening to their feedback."
+                    />
+                  </div>
+                  <div class="flex justify-between">
+                    <input
+                      type="radio"
+                      name="rating-4"
+                      value={0}
+                      bind:group={communication}
+                      class={`mask mask-heart bg-red-400 ${communication == 0 ? "" : "bg-opacity-20"}`}
+                      hidden
+                    />
+                    <input
+                      type="radio"
+                      name="rating-4"
+                      value={1}
+                      bind:group={communication}
+                      class={`mask mask-heart bg-red-400 ${communication == 1 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-4"
+                      value={2}
+                      bind:group={communication}
+                      class={`mask mask-heart bg-orange-400 ${communication == 2 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-4"
+                      value={3}
+                      bind:group={communication}
+                      class={`mask mask-heart bg-yellow-400 ${communication == 3 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-4"
+                      value={4}
+                      bind:group={communication}
+                      class={`mask mask-heart bg-lime-400 ${communication == 4 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-4"
+                      value={5}
+                      bind:group={communication}
+                      class={`mask mask-heart bg-green-400 ${communication == 5 ? "" : "bg-opacity-20"}`}
+                    />
+                  </div>
                 </div>
-              </div>
-              <div
-                class="rating rating-lg gap-8 grid grid-cols-2 flex-inline items-center"
-              >
-                <div class="flex flex-inline items-center">
-                  <p class="text-xl font-bold">Access and Facilities</p>
-                  <QuickTip
-                    title="Access and Facilities"
-                    description="The convenience of location, ample amenities for comfortable transactions, use of clear signages and modes of technology."
-                  />
+                <div
+                  class="rating rating-lg gap-8 grid grid-cols-2 flex-inline items-center"
+                >
+                  <div class="flex flex-inline items-center">
+                    <p class="text-xl font-bold">
+                      Value for money (If applicable)
+                    </p>
+                    <QuickTip
+                      title="Value for money (If applicable)"
+                      description="The satisfaction with timeliness of the billing, billing process/es, preferred methods of payment, reasonable payment period, the acceptable range of costs, and qualitative information on the cost of each service"
+                    />
+                  </div>
+                  <div class="flex justify-between">
+                    <input
+                      type="radio"
+                      name="rating-5"
+                      value={0}
+                      bind:group={value_for_money}
+                      class={`mask mask-heart bg-red-400 ${value_for_money == 0 ? "" : "bg-opacity-20"}`}
+                      hidden
+                    />
+                    <input
+                      type="radio"
+                      name="rating-5"
+                      value={1}
+                      bind:group={value_for_money}
+                      class={`mask mask-heart bg-red-400 ${value_for_money == 1 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-5"
+                      value={2}
+                      bind:group={value_for_money}
+                      class={`mask mask-heart bg-orange-400 ${value_for_money == 2 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-5"
+                      value={3}
+                      bind:group={value_for_money}
+                      class={`mask mask-heart bg-yellow-400 ${value_for_money == 3 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-5"
+                      value={4}
+                      bind:group={value_for_money}
+                      class={`mask mask-heart bg-lime-400 ${value_for_money == 4 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-5"
+                      value={5}
+                      bind:group={value_for_money}
+                      class={`mask mask-heart bg-green-400 ${value_for_money == 5 ? "" : "bg-opacity-20"}`}
+                    />
+                  </div>
                 </div>
-                <div class="flex justify-between">
-                  <input
-                    type="radio"
-                    name="rating-3"
-                    value={0}
-                    bind:group={access_and_facilities}
-                    class={`mask mask-heart bg-red-400 ${access_and_facilities == 0 ? "" : "bg-opacity-20"}`}
-                    hidden
-                  />
-                  <input
-                    type="radio"
-                    name="rating-3"
-                    value={1}
-                    bind:group={access_and_facilities}
-                    class={`mask mask-heart bg-red-400 ${access_and_facilities == 1 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-3"
-                    value={2}
-                    bind:group={access_and_facilities}
-                    class={`mask mask-heart bg-orange-400 ${access_and_facilities == 2 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-3"
-                    value={3}
-                    bind:group={access_and_facilities}
-                    class={`mask mask-heart bg-yellow-400 ${access_and_facilities == 3 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-3"
-                    value={4}
-                    bind:group={access_and_facilities}
-                    class={`mask mask-heart bg-lime-400 ${access_and_facilities == 4 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-3"
-                    value={5}
-                    bind:group={access_and_facilities}
-                    class={`mask mask-heart bg-green-400 ${access_and_facilities == 5 ? "" : "bg-opacity-20"}`}
-                  />
+                <div
+                  class="rating rating-lg gap-8 grid grid-cols-2 flex-inline items-center"
+                >
+                  <div class="flex flex-inline items-center">
+                    <p class="text-xl font-bold">Integrity</p>
+                    <QuickTip
+                      title="Integrity"
+                      description="The assurance that there is honesty, justice, fairness, and trust in each service while dealing with the citizens/clients."
+                    />
+                  </div>
+                  <div class="flex justify-between">
+                    <input
+                      type="radio"
+                      name="rating-6"
+                      value={0}
+                      bind:group={integrity}
+                      class={`mask mask-heart bg-red-400 ${integrity == 0 ? "" : "bg-opacity-20"}`}
+                      hidden
+                    />
+                    <input
+                      type="radio"
+                      name="rating-6"
+                      value={1}
+                      bind:group={integrity}
+                      class={`mask mask-heart bg-red-400 ${integrity == 1 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-6"
+                      value={2}
+                      bind:group={integrity}
+                      class={`mask mask-heart bg-orange-400 ${integrity == 2 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-6"
+                      value={3}
+                      bind:group={integrity}
+                      class={`mask mask-heart bg-yellow-400 ${integrity == 3 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-6"
+                      value={4}
+                      bind:group={integrity}
+                      class={`mask mask-heart bg-lime-400 ${integrity == 4 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-6"
+                      value={5}
+                      bind:group={integrity}
+                      class={`mask mask-heart bg-green-400 ${integrity == 5 ? "" : "bg-opacity-20"}`}
+                    />
+                  </div>
                 </div>
-              </div>
-              <div
-                class="rating rating-lg gap-8 grid grid-cols-2 flex-inline items-center"
-              >
-                <div class="flex flex-inline items-center">
-                  <p class="text-xl font-bold">Communication</p>
-                  <QuickTip
-                    title="Communication"
-                    description="The act of keeping citizens and clients informed in a language they can easily understand, as well as listening to their feedback."
-                  />
+                <div
+                  class="rating rating-lg gap-8 grid grid-cols-2 flex-inline items-center"
+                >
+                  <div class="flex flex-inline items-center">
+                    <p class="text-xl font-bold">Assurance</p>
+                    <QuickTip
+                      title="Assurance"
+                      description="The capability of frontline staff to perform their duties, product and service knowledge, understanding citizen/client needs, helpfulness, and good work relationships."
+                    />
+                  </div>
+                  <div class="flex justify-between">
+                    <input
+                      type="radio"
+                      name="rating-7"
+                      value={0}
+                      bind:group={assurance}
+                      class={`mask mask-heart bg-red-400 ${assurance == 0 ? "" : "bg-opacity-20"}`}
+                      hidden
+                    />
+                    <input
+                      type="radio"
+                      name="rating-7"
+                      value={1}
+                      bind:group={assurance}
+                      class={`mask mask-heart bg-red-400 ${assurance == 1 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-7"
+                      value={2}
+                      bind:group={assurance}
+                      class={`mask mask-heart bg-orange-400 ${assurance == 2 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-7"
+                      value={3}
+                      bind:group={assurance}
+                      class={`mask mask-heart bg-yellow-400 ${assurance == 3 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-7"
+                      value={4}
+                      bind:group={assurance}
+                      class={`mask mask-heart bg-lime-400 ${assurance == 4 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-7"
+                      value={5}
+                      bind:group={assurance}
+                      class={`mask mask-heart bg-green-400 ${assurance == 5 ? "" : "bg-opacity-20"}`}
+                    />
+                  </div>
                 </div>
-                <div class="flex justify-between">
-                  <input
-                    type="radio"
-                    name="rating-4"
-                    value={0}
-                    bind:group={communication}
-                    class={`mask mask-heart bg-red-400 ${communication == 0 ? "" : "bg-opacity-20"}`}
-                    hidden
-                  />
-                  <input
-                    type="radio"
-                    name="rating-4"
-                    value={1}
-                    bind:group={communication}
-                    class={`mask mask-heart bg-red-400 ${communication == 1 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-4"
-                    value={2}
-                    bind:group={communication}
-                    class={`mask mask-heart bg-orange-400 ${communication == 2 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-4"
-                    value={3}
-                    bind:group={communication}
-                    class={`mask mask-heart bg-yellow-400 ${communication == 3 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-4"
-                    value={4}
-                    bind:group={communication}
-                    class={`mask mask-heart bg-lime-400 ${communication == 4 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-4"
-                    value={5}
-                    bind:group={communication}
-                    class={`mask mask-heart bg-green-400 ${communication == 5 ? "" : "bg-opacity-20"}`}
-                  />
+                <div
+                  class="rating rating-lg gap-8 grid grid-cols-2 flex-inline items-center"
+                >
+                  <div class="flex flex-inline items-center">
+                    <p class="text-xl font-bold">Outcome</p>
+                    <QuickTip
+                      title="Outcome"
+                      description="The extent of achieving outcomes or realizing the intended benefits of government services."
+                    />
+                  </div>
+                  <div class="flex justify-between">
+                    <input
+                      type="radio"
+                      name="rating-8"
+                      value={0}
+                      bind:group={outcome}
+                      class={`mask mask-heart bg-red-400 ${outcome == 0 ? "" : "bg-opacity-20"}`}
+                      hidden
+                    />
+                    <input
+                      type="radio"
+                      name="rating-8"
+                      value={1}
+                      bind:group={outcome}
+                      class={`mask mask-heart bg-red-400 ${outcome == 1 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-8"
+                      value={2}
+                      bind:group={outcome}
+                      class={`mask mask-heart bg-orange-400 ${outcome == 2 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-8"
+                      value={3}
+                      bind:group={outcome}
+                      class={`mask mask-heart bg-yellow-400 ${outcome == 3 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-8"
+                      value={4}
+                      bind:group={outcome}
+                      class={`mask mask-heart bg-lime-400 ${outcome == 4 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-8"
+                      value={5}
+                      bind:group={outcome}
+                      class={`mask mask-heart bg-green-400 ${outcome == 5 ? "" : "bg-opacity-20"}`}
+                    />
+                  </div>
                 </div>
-              </div>
-              <div
-                class="rating rating-lg gap-8 grid grid-cols-2 flex-inline items-center"
-              >
-                <div class="flex flex-inline items-center">
-                  <p class="text-xl font-bold">
-                    Value for money (If applicable)
-                  </p>
-                  <QuickTip
-                    title="Value for money (If applicable)"
-                    description="The satisfaction with timeliness of the billing, billing process/es, preferred methods of payment, reasonable payment period, the acceptable range of costs, and qualitative information on the cost of each service"
-                  />
-                </div>
-                <div class="flex justify-between">
-                  <input
-                    type="radio"
-                    name="rating-5"
-                    value={0}
-                    bind:group={value_for_money}
-                    class={`mask mask-heart bg-red-400 ${value_for_money == 0 ? "" : "bg-opacity-20"}`}
-                    hidden
-                  />
-                  <input
-                    type="radio"
-                    name="rating-5"
-                    value={1}
-                    bind:group={value_for_money}
-                    class={`mask mask-heart bg-red-400 ${value_for_money == 1 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-5"
-                    value={2}
-                    bind:group={value_for_money}
-                    class={`mask mask-heart bg-orange-400 ${value_for_money == 2 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-5"
-                    value={3}
-                    bind:group={value_for_money}
-                    class={`mask mask-heart bg-yellow-400 ${value_for_money == 3 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-5"
-                    value={4}
-                    bind:group={value_for_money}
-                    class={`mask mask-heart bg-lime-400 ${value_for_money == 4 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-5"
-                    value={5}
-                    bind:group={value_for_money}
-                    class={`mask mask-heart bg-green-400 ${value_for_money == 5 ? "" : "bg-opacity-20"}`}
-                  />
-                </div>
-              </div>
-              <div
-                class="rating rating-lg gap-8 grid grid-cols-2 flex-inline items-center"
-              >
-                <div class="flex flex-inline items-center">
-                  <p class="text-xl font-bold">Integrity</p>
-                  <QuickTip
-                    title="Integrity"
-                    description="The assurance that there is honesty, justice, fairness, and trust in each service while dealing with the citizens/clients."
-                  />
-                </div>
-                <div class="flex justify-between">
-                  <input
-                    type="radio"
-                    name="rating-6"
-                    value={0}
-                    bind:group={integrity}
-                    class={`mask mask-heart bg-red-400 ${integrity == 0 ? "" : "bg-opacity-20"}`}
-                    hidden
-                  />
-                  <input
-                    type="radio"
-                    name="rating-6"
-                    value={1}
-                    bind:group={integrity}
-                    class={`mask mask-heart bg-red-400 ${integrity == 1 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-6"
-                    value={2}
-                    bind:group={integrity}
-                    class={`mask mask-heart bg-orange-400 ${integrity == 2 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-6"
-                    value={3}
-                    bind:group={integrity}
-                    class={`mask mask-heart bg-yellow-400 ${integrity == 3 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-6"
-                    value={4}
-                    bind:group={integrity}
-                    class={`mask mask-heart bg-lime-400 ${integrity == 4 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-6"
-                    value={5}
-                    bind:group={integrity}
-                    class={`mask mask-heart bg-green-400 ${integrity == 5 ? "" : "bg-opacity-20"}`}
-                  />
-                </div>
-              </div>
-              <div
-                class="rating rating-lg gap-8 grid grid-cols-2 flex-inline items-center"
-              >
-                <div class="flex flex-inline items-center">
-                  <p class="text-xl font-bold">Assurance</p>
-                  <QuickTip
-                    title="Assurance"
-                    description="The capability of frontline staff to perform their duties, product and service knowledge, understanding citizen/client needs, helpfulness, and good work relationships."
-                  />
-                </div>
-                <div class="flex justify-between">
-                  <input
-                    type="radio"
-                    name="rating-7"
-                    value={0}
-                    bind:group={assurance}
-                    class={`mask mask-heart bg-red-400 ${assurance == 0 ? "" : "bg-opacity-20"}`}
-                    hidden
-                  />
-                  <input
-                    type="radio"
-                    name="rating-7"
-                    value={1}
-                    bind:group={assurance}
-                    class={`mask mask-heart bg-red-400 ${assurance == 1 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-7"
-                    value={2}
-                    bind:group={assurance}
-                    class={`mask mask-heart bg-orange-400 ${assurance == 2 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-7"
-                    value={3}
-                    bind:group={assurance}
-                    class={`mask mask-heart bg-yellow-400 ${assurance == 3 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-7"
-                    value={4}
-                    bind:group={assurance}
-                    class={`mask mask-heart bg-lime-400 ${assurance == 4 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-7"
-                    value={5}
-                    bind:group={assurance}
-                    class={`mask mask-heart bg-green-400 ${assurance == 5 ? "" : "bg-opacity-20"}`}
-                  />
-                </div>
-              </div>
-              <div
-                class="rating rating-lg gap-8 grid grid-cols-2 flex-inline items-center"
-              >
-                <div class="flex flex-inline items-center">
-                  <p class="text-xl font-bold">Outcome</p>
-                  <QuickTip
-                    title="Outcome"
-                    description="The extent of achieving outcomes or realizing the intended benefits of government services."
-                  />
-                </div>
-                <div class="flex justify-between">
-                  <input
-                    type="radio"
-                    name="rating-8"
-                    value={0}
-                    bind:group={outcome}
-                    class={`mask mask-heart bg-red-400 ${outcome == 0 ? "" : "bg-opacity-20"}`}
-                    hidden
-                  />
-                  <input
-                    type="radio"
-                    name="rating-8"
-                    value={1}
-                    bind:group={outcome}
-                    class={`mask mask-heart bg-red-400 ${outcome == 1 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-8"
-                    value={2}
-                    bind:group={outcome}
-                    class={`mask mask-heart bg-orange-400 ${outcome == 2 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-8"
-                    value={3}
-                    bind:group={outcome}
-                    class={`mask mask-heart bg-yellow-400 ${outcome == 3 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-8"
-                    value={4}
-                    bind:group={outcome}
-                    class={`mask mask-heart bg-lime-400 ${outcome == 4 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-8"
-                    value={5}
-                    bind:group={outcome}
-                    class={`mask mask-heart bg-green-400 ${outcome == 5 ? "" : "bg-opacity-20"}`}
-                  />
-                </div>
-              </div>
-              <div
-                class="rating rating-lg gap-8 grid grid-cols-2 flex-inline items-center"
-              >
-                <p class="text-xl font-bold">Overall Satisfaction Rating</p>
-                <div class="flex justify-between">
-                  <input
-                    type="radio"
-                    name="rating-9"
-                    value={0}
-                    bind:group={overall_satisfaction}
-                    class={`mask mask-heart bg-red-400 ${overall_satisfaction == 0 ? "" : "bg-opacity-20"}`}
-                    hidden
-                  />
-                  <input
-                    type="radio"
-                    name="rating-9"
-                    value={1}
-                    bind:group={overall_satisfaction}
-                    class={`mask mask-heart bg-red-400 ${overall_satisfaction == 1 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-9"
-                    value={2}
-                    bind:group={overall_satisfaction}
-                    class={`mask mask-heart bg-orange-400 ${overall_satisfaction == 2 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-9"
-                    value={3}
-                    bind:group={overall_satisfaction}
-                    class={`mask mask-heart bg-yellow-400 ${overall_satisfaction == 3 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-9"
-                    value={4}
-                    bind:group={overall_satisfaction}
-                    class={`mask mask-heart bg-lime-400 ${overall_satisfaction == 4 ? "" : "bg-opacity-20"}`}
-                  />
-                  <input
-                    type="radio"
-                    name="rating-9"
-                    value={5}
-                    bind:group={overall_satisfaction}
-                    class={`mask mask-heart bg-green-400 ${overall_satisfaction == 5 ? "" : "bg-opacity-20"}`}
-                  />
+                <div
+                  class="rating rating-lg gap-8 grid grid-cols-2 flex-inline items-center"
+                >
+                  <p class="text-xl font-bold">Overall Satisfaction Rating</p>
+                  <div class="flex justify-between">
+                    <input
+                      type="radio"
+                      name="rating-9"
+                      value={0}
+                      bind:group={overall_satisfaction}
+                      class={`mask mask-heart bg-red-400 ${overall_satisfaction == 0 ? "" : "bg-opacity-20"}`}
+                      hidden
+                    />
+                    <input
+                      type="radio"
+                      name="rating-9"
+                      value={1}
+                      bind:group={overall_satisfaction}
+                      class={`mask mask-heart bg-red-400 ${overall_satisfaction == 1 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-9"
+                      value={2}
+                      bind:group={overall_satisfaction}
+                      class={`mask mask-heart bg-orange-400 ${overall_satisfaction == 2 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-9"
+                      value={3}
+                      bind:group={overall_satisfaction}
+                      class={`mask mask-heart bg-yellow-400 ${overall_satisfaction == 3 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-9"
+                      value={4}
+                      bind:group={overall_satisfaction}
+                      class={`mask mask-heart bg-lime-400 ${overall_satisfaction == 4 ? "" : "bg-opacity-20"}`}
+                    />
+                    <input
+                      type="radio"
+                      name="rating-9"
+                      value={5}
+                      bind:group={overall_satisfaction}
+                      class={`mask mask-heart bg-green-400 ${overall_satisfaction == 5 ? "" : "bg-opacity-20"}`}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <button class="btn btn-primary float-end mt-4" on:click={submit}>
-            Submit
-          </button>
+            <button class="btn btn-primary float-end mt-4" on:click={submit}>
+              Submit
+            </button>
+          {/if}
         </div>
       {:else}
         <h1>Access Denied</h1>
