@@ -95,6 +95,7 @@ async fn submit_feedback(
     id: &str,
     feedback: &str,
     emotion: Option<String>,
+    metadata: &str,
     recording: bool,
 ) -> Result<String, String> {
     let feedback_data = FeedbackData::parse(feedback);
@@ -118,6 +119,7 @@ async fn submit_feedback(
                 let hybrid_feedback_data = HybridFeedbackData {
                     feedback_data,
                     emotion_data: serde_json::from_str(&emotion).unwrap(),
+                    metadata: serde_json::from_str(metadata).unwrap(),
                 };
                 db::save_hybrid_feedback(&serde_json::to_string(&hybrid_feedback_data).unwrap())
                     .await;

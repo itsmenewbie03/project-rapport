@@ -33,6 +33,7 @@ pub struct FeedbackData {
 pub struct HybridFeedbackData {
     pub feedback_data: FeedbackData,
     pub emotion_data: HashMap<String, String>,
+    pub metadata: HashMap<String, String>,
 }
 
 impl FeedbackData {
