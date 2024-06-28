@@ -116,10 +116,26 @@ async fn submit_feedback(
             // and start faau if the user allowed recording
             recorder::stop().await;
             if let Some(emotion) = emotion {
+                let feedback_mean = feedback_data.mean();
+                // NOTE: adapted from
+                // 5.   4.21 - 5.00   VS
+                // 4.   3.41 - 4.20   S
+                // 3.   2.61 - 3.40   NEUTRAL
+                // 2.   1.81 - 2.60   D
+                // 1.   1.00 - 1.80   VD
+                let feedback_category = if feedback_mean >= 3.41 {
+                    "positive"
+                } else if feedback_mean < 2.61 {
+                    "negative"
+                } else {
+                    "neutral"
+                };
+                let mut metadata: HashMap<String, String> = serde_json::from_str(metadata).unwrap();
+                metadata.insert("feedback_category".to_owned(), feedback_category.to_owned());
                 let hybrid_feedback_data = HybridFeedbackData {
                     feedback_data,
                     emotion_data: serde_json::from_str(&emotion).unwrap(),
-                    metadata: serde_json::from_str(metadata).unwrap(),
+                    metadata,
                 };
                 db::save_hybrid_feedback(&serde_json::to_string(&hybrid_feedback_data).unwrap())
                     .await;
