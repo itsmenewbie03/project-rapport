@@ -43,6 +43,7 @@ impl FeedbackData {
             Err(e) => Err(e.to_string()),
         }
     }
+
     pub fn save_as_json(&self, id: &str) {
         let mut file =
             File::create(format!("{}_feedback.json", id)).expect("Failed to create a file!");
@@ -51,11 +52,25 @@ impl FeedbackData {
         file.write_all(feedback_data.as_bytes())
             .expect("Failed to write feedback data to file");
     }
+
     pub async fn save_to_db(&self, feedback_type: FeedbackType) -> bool {
         let data = serde_json::to_string(self).unwrap();
         match feedback_type {
             FeedbackType::Trad => db::save_trad_feedback(&data).await,
             FeedbackType::Hybrid => db::save_hybrid_feedback(&data).await,
         }
+    }
+
+    pub fn mean(&self) -> f64 {
+        let total = self.responsiveness
+            + self.reliability
+            + self.access_and_facilities
+            + self.communication
+            + self.value_for_money
+            + self.integrity
+            + self.assurance
+            + self.outcome
+            + self.overall_satisfaction;
+        total as f64 / 9.0
     }
 }

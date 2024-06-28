@@ -30,6 +30,7 @@
   "dependencies": {
     "@tauri-apps/api": "^1.5.6",
     "email-validator": "^2.0.4",
+    "human-readable-numbers": "^0.9.5",
     "svelte-french-toast": "^1.2.0",
     "vizzu-story": "^0.7.0",
     "zod": "^3.23.8"

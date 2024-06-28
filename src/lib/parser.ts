@@ -1,10 +1,12 @@
-type FeedbackType = "trad" | "hybrid";
+// @ts-ignore
+import HRNumbers from 'human-readable-numbers';
 
+type FeedbackType = "trad" | "hybrid";
 const parse_feedback_data = (feedback_type: FeedbackType, data: string) => {
   return feedback_type == "trad" ? trad_parser(data) : hybrid_parser(data);
 };
 
-const trad_parser = (data: string) => {};
+const trad_parser = (data: string) => { };
 
 const hybrid_parser = (data: string) => {
   let output: object[] = [];
@@ -111,4 +113,28 @@ const vizzu_parser = (data: object[]) => {
   return vizzu_data;
 };
 
-export { parse_feedback_data };
+const stats_parser = (data: string): Record<string, number> => {
+  const parsed_data = JSON.parse(data);
+  let feedback_stats: Record<string, number> = {
+    "positive": 0,
+    "negative": 0,
+    "neutral": 0,
+    "total": parsed_data.length,
+  };
+  parsed_data.forEach((e: any) => {
+    const parsed_inner_data = JSON.parse(e.data);
+    const { metadata } = parsed_inner_data;
+    const { feedback_category } = metadata;
+    feedback_stats[feedback_category] += 1;
+  });
+  // TODO: make human readable numbers
+  for (const key in feedback_stats) {
+    if (feedback_stats.hasOwnProperty(key)) {
+      const element = feedback_stats[key];
+      feedback_stats[key] = HRNumbers.toHumanString(element);
+    }
+  }
+  return feedback_stats;
+}
+
+export { parse_feedback_data, stats_parser };
