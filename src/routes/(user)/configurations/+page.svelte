@@ -11,6 +11,7 @@
 
   let max_negative_feedback: number = 3;
   let email_recipient: string = "email@example.com";
+  let office_name: string = "NOT CONFIGURED YET";
 
   type ConfigData = {
     name: string;
@@ -26,6 +27,7 @@
       // NOTE: we won't do dyn in rust to JS will adjust xD
       max_negative_feedback: max_negative_feedback.toString(),
       email_recipient,
+      office_name,
     };
     try {
       const config_saved: string = await invoke("save_configs", {
@@ -49,6 +51,8 @@
           max_negative_feedback = parseInt(config.value);
         } else if (config.name === "email_recipient") {
           email_recipient = config.value;
+        } else if (config.name === "office_name") {
+          office_name = config.value;
         }
       });
       console.log("CONFIGS", configs);
@@ -99,6 +103,21 @@
             <div class="label">
               <span class="label-text-alt"
                 >Alerts will be sent to this email.</span
+              >
+            </div>
+          </label>
+          <label class="form-control w-full">
+            <div class="label">
+              <span class="label-text">Office Name</span>
+            </div>
+            <input
+              type="email"
+              class="input input-bordered w-full"
+              bind:value={office_name}
+            />
+            <div class="label">
+              <span class="label-text-alt"
+                >The name of the office in which this kiosk is deployed.</span
               >
             </div>
           </label>
