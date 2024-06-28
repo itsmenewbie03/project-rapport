@@ -113,9 +113,29 @@
       outcome,
       overall_satisfaction,
     };
+
+    // WARN: shitty code ahead
+    let office_name: string = "NOT CONFIGURED";
+    type ConfigData = {
+      name: string;
+      value: string;
+    };
+    try {
+      const configs: ConfigData[] = await invoke("get_configs");
+      configs.forEach((config) => {
+        if (config.name === "office_name") {
+          office_name = config.value;
+        }
+      });
+    } catch (err) {
+      console.log("failed to get office name from configs database!");
+    }
+    // WARN: end of shitty code
+
     const metadata = {
       client_type: client_type === "other" ? other_client_type : client_type,
       purpose_of_visit,
+      office_name,
     };
     // TODO: check for 0s in data
     const non_rated = [];
