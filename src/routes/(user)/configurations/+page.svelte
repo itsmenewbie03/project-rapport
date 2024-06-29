@@ -127,14 +127,14 @@
           </label>
           <label class="form-control w-full">
             <div class="label">
-              <span class="label-text">Enable Consent Screen</span>
+              <span class="label-text">Consent Screen</span>
             </div>
             <select
               class="select select-primary w-full max-w-xs"
               bind:value={enable_consent_screen}
             >
-              <option value="true">True</option>
-              <option value="false">False</option>
+              <option value="true">On</option>
+              <option value="false">Off</option>
             </select>
             <div class="label">
               <span class="label-text-alt"
