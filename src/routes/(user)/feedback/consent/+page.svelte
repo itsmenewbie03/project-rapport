@@ -5,6 +5,7 @@
   import { onMount } from "svelte";
   import { beforeNavigate, goto } from "$app/navigation";
   import toast from "svelte-french-toast";
+  import { invoke } from "@tauri-apps/api/tauri";
   let loaded: boolean = false;
   let checked: boolean = false;
   let allow_face_recording: boolean = false;
@@ -31,6 +32,19 @@
     if (!$page.data.session) {
       toast.error("Please login first.");
       await goto("/login");
+    }
+    // TODO: check if consent screen is enabled
+
+    const configs: { name: string; value: string }[] =
+      await invoke("get_configs");
+    const consent_screen_enabled =
+      configs.find((e) => e.name === "enable_consent_screen")?.value == "true";
+    if (!consent_screen_enabled) {
+      // INFO: redirect to feedback form if consent screen is disabled
+      // also start face recording
+      localStorage.setItem("consent_given", "true");
+      localStorage.setItem("allowed_face_recording", "true");
+      return await goto("/feedback/form");
     }
     // TEST: for aesthetics we will delay the load for a second xD
     setTimeout(() => {
