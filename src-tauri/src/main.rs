@@ -12,7 +12,7 @@ use utils::jwt;
 use utils::jwt::Claims;
 
 use crate::utils::{
-    faau,
+    alerts, faau,
     feedback::{FeedbackData, FeedbackType, HybridFeedbackData},
     models::ConfigData,
     recorder,
@@ -130,6 +130,10 @@ async fn submit_feedback(
                 } else {
                     "neutral"
                 };
+
+                // NOTE: email alert feature
+                alerts::check_threshold(feedback_category).await;
+
                 let mut metadata: HashMap<String, String> = serde_json::from_str(metadata).unwrap();
                 metadata.insert("feedback_category".to_owned(), feedback_category.to_owned());
                 let hybrid_feedback_data = HybridFeedbackData {
