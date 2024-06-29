@@ -12,6 +12,7 @@
   let max_negative_feedback: number = 3;
   let email_recipient: string = "email@example.com";
   let office_name: string = "NOT CONFIGURED YET";
+  let enable_consent_screen: string = "false";
 
   type ConfigData = {
     name: string;
@@ -28,6 +29,7 @@
       max_negative_feedback: max_negative_feedback.toString(),
       email_recipient,
       office_name,
+      enable_consent_screen,
     };
     try {
       const config_saved: string = await invoke("save_configs", {
@@ -53,6 +55,8 @@
           email_recipient = config.value;
         } else if (config.name === "office_name") {
           office_name = config.value;
+        } else if (config.name === "enable_consent_screen") {
+          enable_consent_screen = config.value;
         }
       });
       console.log("CONFIGS", configs);
@@ -80,7 +84,7 @@
             </div>
             <input
               type="number"
-              class="input input-bordered w-full"
+              class="input input-bordered w-full max-w-xs"
               bind:value={max_negative_feedback}
               min="2"
             />
@@ -97,7 +101,7 @@
             </div>
             <input
               type="email"
-              class="input input-bordered w-full"
+              class="input input-bordered w-full max-w-xs"
               bind:value={email_recipient}
             />
             <div class="label">
@@ -112,7 +116,7 @@
             </div>
             <input
               type="email"
-              class="input input-bordered w-full"
+              class="input input-bordered w-full max-w-xs"
               bind:value={office_name}
             />
             <div class="label">
@@ -121,8 +125,24 @@
               >
             </div>
           </label>
-          <button class="btn btn-primary mt-2 float-right w-20" on:click={save}
-            >Save</button
+          <label class="form-control w-full">
+            <div class="label">
+              <span class="label-text">Enable Consent Screen</span>
+            </div>
+            <select
+              class="select select-primary w-full max-w-xs"
+              bind:value={enable_consent_screen}
+            >
+              <option value="true">True</option>
+              <option value="false">False</option>
+            </select>
+            <div class="label">
+              <span class="label-text-alt"
+                >Show a consent message prompt before the actual feedback page.</span
+              >
+            </div>
+          </label>
+          <button class="btn btn-primary mt-2 w-20" on:click={save}>Save</button
           >
         </div>
       {:else}
