@@ -19,9 +19,8 @@ pub async fn generate_pdf(feedback_data: Vec<FeedbackDataRow>) -> Option<String>
         .iter()
         .find(|path| std::path::Path::new(path).exists())
         .expect("Could not find font directory");
-    let default_font =
-        fonts::from_files(font_dir, DEFAULT_FONT_NAME, Some(fonts::Builtin::Helvetica))
-            .expect("Failed to load the default font family");
+    let default_font = fonts::from_files(font_dir, DEFAULT_FONT_NAME, None)
+        .expect("Failed to load the default font family");
     let mut doc = genpdf::Document::new(default_font);
 
     // INFO: fetch the data
