@@ -9,3 +9,4 @@ pub mod mailer;
 pub mod models;
 pub mod notifications;
 pub mod recorder;
+pub mod reports;
