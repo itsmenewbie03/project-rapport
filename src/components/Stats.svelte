@@ -18,7 +18,7 @@
       <Icon name="feedback" _class="inline-block h-8 w-8 stroke-current" />
     </div>
     <div class="stat-title">Feedbacks</div>
-    <div class="stat-value">{parsed_data["total"] ?? 0}</div>
+    <div class="stat-value">{parsed_data["total"]}</div>
     <div class="stat-desc">Jan 1st - Feb 1st</div>
   </div>
 
@@ -27,7 +27,7 @@
       <Icon name="happy" _class="inline-block h-8 w-8 stroke-current" />
     </div>
     <div class="stat-title">Postive Feedbacks</div>
-    <div class="stat-value">{parsed_data["positive"] ?? 0}</div>
+    <div class="stat-value">{parsed_data["positive"]}</div>
     <div class="stat-desc">Jan 1st - Feb 1st</div>
   </div>
 
@@ -36,7 +36,7 @@
       <Icon name="sad" _class="inline-block h-8 w-8 stroke-current" />
     </div>
     <div class="stat-title">Negative Feedbacks</div>
-    <div class="stat-value">{parsed_data["negative"] ?? 0}</div>
+    <div class="stat-value">{parsed_data["negative"]}</div>
     <div class="stat-desc">Jan 1st - Feb 1st</div>
   </div>
 </div>

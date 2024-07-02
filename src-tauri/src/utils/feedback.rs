@@ -57,10 +57,7 @@ impl FeedbackData {
         let data = serde_json::to_string(self).unwrap();
         match feedback_type {
             FeedbackType::Trad => db::save_trad_feedback(&data).await,
-            // WARN: we are heavily redesigning the system
-            // the follow line will not get called
-            // if it get's called then we will tag it as UNTAGGED
-            FeedbackType::Hybrid => db::save_hybrid_feedback(&data, "UNTAGGED").await,
+            FeedbackType::Hybrid => db::save_hybrid_feedback(&data).await,
         }
     }
 
