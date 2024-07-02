@@ -7,6 +7,7 @@
   import { goto } from "$app/navigation";
   import toast from "svelte-french-toast";
   import Stats from "$components/Stats.svelte";
+  import ReportGenerator from "$components/ReportGenerator.svelte";
   let loaded: boolean = false;
 
   onMount(async () => {
@@ -30,6 +31,7 @@
             <DashboardQuickMenu />
             <Stats />
           </div>
+          <ReportGenerator />
         </div>
       {:else}
         <h1>Access Denied</h1>
