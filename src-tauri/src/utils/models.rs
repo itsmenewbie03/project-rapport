@@ -11,5 +11,6 @@ pub struct ConfigData {
 pub struct FeedbackDataRow {
     pub id: i32,
     pub data: String,
+    pub tag: String,
     pub created_at: String,
 }
