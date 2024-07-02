@@ -4,6 +4,7 @@
 pub mod utils;
 
 use std::collections::HashMap;
+
 use utils::auth::is_credentials_valid;
 use utils::auth::models::UserData;
 use utils::db;
@@ -13,9 +14,8 @@ use utils::jwt::Claims;
 use crate::utils::{
     alerts, faau,
     feedback::{FeedbackData, FeedbackType, HybridFeedbackData},
-    mailer,
     models::ConfigData,
-    notifications, recorder, reports,
+    recorder,
 };
 
 #[tauri::command]
@@ -141,11 +141,8 @@ async fn submit_feedback(
                     emotion_data: serde_json::from_str(&emotion).unwrap(),
                     metadata,
                 };
-                db::save_hybrid_feedback(
-                    &serde_json::to_string(&hybrid_feedback_data).unwrap(),
-                    feedback_category,
-                )
-                .await;
+                db::save_hybrid_feedback(&serde_json::to_string(&hybrid_feedback_data).unwrap())
+                    .await;
             }
             Ok("Feedback submitted successfully".to_owned())
         }
@@ -215,44 +212,6 @@ async fn get_feedbacks(class: &str) -> Result<String, String> {
         Err(e) => Err(e),
     }
 }
-
-#[tauri::command]
-async fn generate_report() -> Result<String, String> {
-    let configs = db::get_configs().await;
-    if configs.is_none() {
-        return Err("Failed to load configs!".to_owned());
-    }
-    let configs = configs.unwrap();
-    let email_recipient = &configs
-        .iter()
-        .find(|x| x.name == "email_recipient")
-        .unwrap_or(&ConfigData {
-            name: "email_recipient".to_owned(),
-            value: "".to_owned(),
-        })
-        .value
-        .clone();
-    if email_recipient.is_empty() {
-        notifications::warn("Email Recipient is not configured. Report will not be sent");
-        return Err("Email Recipient is not configured. Report will not be sent".to_owned());
-    }
-    let feedback_data = db::get_feedbacks(FeedbackType::Hybrid).await;
-    if feedback_data.is_none() {
-        return Err("No feedback data available.".to_owned());
-    }
-    let report = reports::generate_pdf(feedback_data.unwrap()).await;
-    match report {
-        Some(report) => {
-            if mailer::send_report(email_recipient, &report) {
-                Ok("Report has been emailed to the supervisor successfully!".to_owned())
-            } else {
-                Err("Failed to email report.".to_owned())
-            }
-        }
-        None => Err("Failed to generate report!".to_owned()),
-    }
-}
-
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
@@ -266,8 +225,7 @@ fn main() {
             take_photo,
             update_profile,
             change_password,
-            get_feedbacks,
-            generate_report
+            get_feedbacks
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

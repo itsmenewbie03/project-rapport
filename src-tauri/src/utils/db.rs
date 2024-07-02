@@ -41,7 +41,6 @@ pub async fn init() {
         "CREATE TABLE IF NOT EXISTS trad_feedback_data (
                 id         INTEGER PRIMARY KEY AUTOINCREMENT,
                 data       TEXT NOT NULL,
-                tag        TEXT NOT NULL,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );",
     )
@@ -54,7 +53,6 @@ pub async fn init() {
         "CREATE TABLE IF NOT EXISTS hybrid_feedback_data (
                 id         INTEGER PRIMARY KEY AUTOINCREMENT,
                 data       TEXT NOT NULL,
-                tag        TEXT NOT NULL,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );",
     )
@@ -197,11 +195,10 @@ pub async fn save_trad_feedback(data: &str) -> bool {
     }
 }
 
-pub async fn save_hybrid_feedback(data: &str, feedback_category: &str) -> bool {
+pub async fn save_hybrid_feedback(data: &str) -> bool {
     let db = get_db_connection().await.unwrap();
-    let result = sqlx::query("INSERT INTO hybrid_feedback_data (data,tag) VALUES (?,?)")
+    let result = sqlx::query("INSERT INTO hybrid_feedback_data (data) VALUES (?)")
         .bind(data)
-        .bind(feedback_category)
         .execute(&db)
         .await;
     match result {
@@ -210,13 +207,12 @@ pub async fn save_hybrid_feedback(data: &str, feedback_category: &str) -> bool {
     }
 }
 
-pub fn save_hybrid_feedback_sync(data: &str, feedback_category: &str) -> bool {
+pub fn save_hybrid_feedback_sync(data: &str) -> bool {
     let rt = Runtime::new().unwrap();
     rt.block_on(async {
         let db = get_db_connection().await.unwrap();
-        let result = sqlx::query("INSERT INTO hybrid_feedback_data (data,tag) VALUES (?,?)")
+        let result = sqlx::query("INSERT INTO hybrid_feedback_data (data) VALUES (?)")
             .bind(data)
-            .bind(feedback_category)
             .execute(&db)
             .await;
         match result {
