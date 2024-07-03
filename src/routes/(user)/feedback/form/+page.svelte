@@ -240,10 +240,14 @@
     }
     // TODO: check for flags in localStorage
     if (localStorage.getItem("consent_given") !== "true") {
-      toast.error("Please provide consent first.");
-      // BUG: remove to activate the feature
-      // await goto("/feedback/consent");
-      // return;
+      toast.error("Session expired, please start from the beginning.");
+      // HACK: stop the recording just in case the user reloads the feedback page.
+      // why do we have to suffer for their mistakes? xD
+      await invoke("clear_recording", {
+        id: "I DON'T HAVE ENOUGH TIME TO IMPLEMENT THIS PROPERLY xD!",
+      });
+      await goto("/feedback/consent");
+      return;
     }
     // TEST: for aesthetics we will delay the load for a second xD
     setTimeout(() => {
@@ -346,10 +350,12 @@
                 />
               </div>
 
-              <p>
-                We greatly value your opinion. Please assess your experience
-                with our product or service by selecting the icons that
-                corresponds to your rating using the scale given below:
+              <p class="text-md">
+                This feedback scale uses colors! <b>
+                  From left to right, the hearts represent a scale of 1 to 5.
+                  Red means very unhappy, orange unhappy, yellow okay, lime
+                  happy, and green very happy.</b
+                >
               </p>
               <div class="flex flex-col gap-y-1">
                 <div
