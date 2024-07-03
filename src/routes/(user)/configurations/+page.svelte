@@ -84,7 +84,7 @@
             </div>
             <input
               type="number"
-              class="input input-bordered w-full max-w-xs"
+              class="input input-bordered w-full"
               bind:value={max_negative_feedback}
               min="2"
             />
@@ -101,7 +101,7 @@
             </div>
             <input
               type="email"
-              class="input input-bordered w-full max-w-xs"
+              class="input input-bordered w-full"
               bind:value={email_recipient}
             />
             <div class="label">
@@ -116,7 +116,7 @@
             </div>
             <input
               type="email"
-              class="input input-bordered w-full max-w-xs"
+              class="input input-bordered w-full"
               bind:value={office_name}
             />
             <div class="label">
@@ -129,13 +129,28 @@
             <div class="label">
               <span class="label-text">Consent Screen</span>
             </div>
-            <select
-              class="select select-primary w-full max-w-xs"
-              bind:value={enable_consent_screen}
-            >
-              <option value="true">On</option>
-              <option value="false">Off</option>
-            </select>
+            <div class="flex flex-inline">
+              <label class="label cursor-pointer">
+                <input
+                  type="radio"
+                  name="enable_consent_screen"
+                  bind:group={enable_consent_screen}
+                  value="true"
+                  class="radio"
+                />
+                <span class="label-text ml-2">On</span>
+              </label>
+              <label class="label cursor-pointer">
+                <input
+                  type="radio"
+                  name="enable_consent_screen"
+                  bind:group={enable_consent_screen}
+                  value="false"
+                  class="radio"
+                />
+                <span class="label-text ml-2">Off</span>
+              </label>
+            </div>
             <div class="label">
               <span class="label-text-alt"
                 >Show a consent message prompt before the actual feedback page.</span
