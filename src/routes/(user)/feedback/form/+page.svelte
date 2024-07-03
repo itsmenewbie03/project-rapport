@@ -18,6 +18,8 @@
 
   let client_type: string = "";
   let other_client_type: string = "";
+  let contact_number: string = "";
+  let name: string = "";
   let purpose_of_visit: string = "";
   let initial_step_done = false;
 
@@ -136,7 +138,10 @@
       client_type: client_type === "other" ? other_client_type : client_type,
       purpose_of_visit,
       office_name,
+      contact_number,
+      name,
     };
+
     // TODO: check for 0s in data
     const non_rated = [];
     for (let key in data) {
@@ -303,25 +308,90 @@
       {#if $page.data.session}
         <div class="px-14 py-4">
           {#if !client_type || !purpose_of_visit || !initial_step_done}
-            <p class="text-xl font-bold">I am a</p>
-            <select
-              class="select select-primary w-full max-w-xs mt-1"
-              bind:value={client_type}
-            >
-              <option disabled selected value="">Select an option</option>
-              <option value="student">Student</option>
-              <option value="parent">Parent</option>
-              <option value="teacher">Teacher</option>
-              <option value="visitor">Visitor</option>
-              <option value="government_employee">Government Employee</option>
-              <option value="other">Other</option>
-            </select>
+            <p class="text-xl font-bold">Name</p>
+            <input
+              type="text"
+              placeholder="Optional"
+              bind:value={name}
+              class="input input-bordered w-full"
+            />
+            <p class="text-xl font-bold mt-4">Contact Number</p>
+            <input
+              type="text"
+              placeholder="Optional"
+              bind:value={contact_number}
+              class="input input-bordered w-full"
+            />
+            <p class="text-xl font-bold mt-4">I am a</p>
+            <div class="flex flex-inline items-center justify-between">
+              <label class="label cursor-pointer">
+                <input
+                  type="radio"
+                  name="client_type"
+                  bind:group={client_type}
+                  value="student"
+                  class="radio"
+                />
+                <span class="label-text ml-2">Student</span>
+              </label>
+              <label class="label cursor-pointer">
+                <input
+                  type="radio"
+                  name="client_type"
+                  bind:group={client_type}
+                  value="parent"
+                  class="radio"
+                />
+                <span class="label-text ml-2">Parent</span>
+              </label>
+              <label class="label cursor-pointer">
+                <input
+                  type="radio"
+                  name="client_type"
+                  bind:group={client_type}
+                  value="teacher"
+                  class="radio"
+                />
+                <span class="label-text ml-2">Teacher</span>
+              </label>
+              <label class="label cursor-pointer">
+                <input
+                  type="radio"
+                  name="client_type"
+                  bind:group={client_type}
+                  value="visitor"
+                  class="radio"
+                />
+                <span class="label-text ml-2">Visitor</span>
+              </label>
+              <label class="label cursor-pointer">
+                <input
+                  type="radio"
+                  name="client_type"
+                  bind:group={client_type}
+                  value="government_employee"
+                  class="radio"
+                />
+                <span class="label-text ml-2">Government Employee</span>
+              </label>
+              <label class="label cursor-pointer">
+                <input
+                  type="radio"
+                  name="client_type"
+                  bind:group={client_type}
+                  value="other"
+                  class="radio"
+                />
+                <span class="label-text ml-2">Other</span>
+              </label>
+            </div>
             {#if client_type == "other"}
+              <p class="text-xl font-bold mt-4">Please Specify</p>
               <input
                 type="text"
-                placeholder="Please Specify"
+                placeholder="Other"
                 bind:value={other_client_type}
-                class="input input-bordered w-full max-w-xs ml-4"
+                class="input input-bordered w-full"
               />
             {/if}
             <p class="text-xl font-bold mt-4">Purpose of Visit</p>
@@ -329,7 +399,7 @@
               type="text"
               placeholder="Enter your purpose of visit here..."
               bind:value={purpose_of_visit}
-              class="input input-bordered w-full max-w-xs mt-1"
+              class="input input-bordered w-full mt-1"
             />
             <div class="mt-4">
               <button
