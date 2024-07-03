@@ -191,6 +191,22 @@
       toast.error("Please fill out all the fields.");
       return;
     }
+    // INFO: when user allowed_face_recording we should tell our backend to start recording
+    if (localStorage.getItem("allowed_face_recording") === "true") {
+      try {
+        await invoke("start_face_recording", {
+          id: uuid,
+        });
+        toast.success("You are now being recorded.");
+        recording = true;
+      } catch (error: any) {
+        toast.error("There was an error starting the recording.");
+        // TODO: implement logging for debugging
+      }
+    }
+    // NOTE: consent is only valid for one feedback session
+    localStorage.removeItem("consent_given");
+    localStorage.removeItem("allowed_face_recording");
     initial_step_done = true;
   };
 
@@ -233,22 +249,6 @@
     setTimeout(() => {
       loaded = true;
     }, 1000);
-    // INFO: when user allowed_face_recording we should tell our backend to start recording
-    if (localStorage.getItem("allowed_face_recording") === "true") {
-      try {
-        await invoke("start_face_recording", {
-          id: uuid,
-        });
-        toast.success("You are now being recorded.");
-        recording = true;
-      } catch (error: any) {
-        toast.error("There was an error starting the recording.");
-        // TODO: implement logging for debugging
-      }
-    }
-    // NOTE: consent is only valid for one feedback session
-    localStorage.removeItem("consent_given");
-    localStorage.removeItem("allowed_face_recording");
   });
 
   beforeNavigate(async (nav) => {

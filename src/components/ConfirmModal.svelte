@@ -32,6 +32,10 @@
         success: "Welcome Back!",
         error: "Failed to redirect, please reload the page.",
       });
+      // NOTE: we will force stop recording on exit
+      await invoke("clear_recording", {
+        id: "I DON'T HAVE ENOUGH TIME TO IMPLEMENT THIS PROPERLY xD!",
+      });
       localStorage.removeItem("allowed_to_exit");
     } else {
       hide();

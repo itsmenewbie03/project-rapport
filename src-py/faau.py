@@ -80,6 +80,7 @@ class BackgroundAnalysis:
             except:
                 print("[PYTHON]: Failed to detect face in _run_analysis")
                 continue
+            # NOTE: we only take the first face
             frame_res.append(res[0])
             print(res)
             self.capture_now = False
