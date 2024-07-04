@@ -1,9 +1,26 @@
 // @ts-ignore
-import HRNumbers from 'human-readable-numbers';
-
+import HRNumbers from "human-readable-numbers";
 type FeedbackType = "trad" | "hybrid";
 const parse_feedback_data = (feedback_type: FeedbackType, data: string) => {
   return feedback_type == "trad" ? trad_parser(data) : hybrid_parser(data);
+};
+// WARN: this code is high voltage xD
+// DO NOT TOUCH YOU WILL BE FIRED !!!!!!!
+const getMaxKey = (
+  obj: Record<string, number>,
+): [string, number] | undefined => {
+  // Check if the object is empty
+  if (Object.keys(obj).length === 0) {
+    return undefined;
+  }
+
+  // Find the entry with the max value using reduce and destructuring
+  return Object.entries(obj).reduce(
+    ([maxKey, maxValue], [key, value]) =>
+      value > maxValue ? [key, value] : [maxKey, maxValue],
+    // Initial value for reduction (first key-value pair)
+    [Object.keys(obj)[0], Object.values(obj)[0]],
+  );
 };
 
 const trad_parser = (data: string) => { };
@@ -116,10 +133,10 @@ const vizzu_parser = (data: object[]) => {
 const stats_parser = (data: string): Record<string, number> => {
   const parsed_data = JSON.parse(data);
   let feedback_stats: Record<string, number> = {
-    "positive": 0,
-    "negative": 0,
-    "neutral": 0,
-    "total": parsed_data.length,
+    positive: 0,
+    negative: 0,
+    neutral: 0,
+    total: parsed_data.length,
   };
   parsed_data.forEach((e: any) => {
     const parsed_inner_data = JSON.parse(e.data);
@@ -135,6 +152,56 @@ const stats_parser = (data: string): Record<string, number> => {
     }
   }
   return feedback_stats;
-}
+};
 
-export { parse_feedback_data, stats_parser };
+const history_parser = (data: string): any => {
+  let output: object[] = [];
+  const parsed_data = JSON.parse(data);
+  // INFO: manual parsing it is xD
+  parsed_data.forEach((e: any) => {
+    const inner_parsed_data = JSON.parse(e.data);
+    let total_rating = 0;
+    const { metadata, feedback_data } = inner_parsed_data;
+    for (const key in feedback_data) {
+      if (feedback_data.hasOwnProperty(key)) {
+        const element = feedback_data[key];
+        total_rating += element;
+      }
+    }
+    let mean_rating = total_rating / 9;
+    let mean_rating_percentage = (mean_rating / 5.0) * 100;
+    // INFO: emotion data parsing (this easy to do in pandas xD)
+    // but I will write it by hand because I'm dumb (don't be like me xD)
+    const { emotion_data } = inner_parsed_data;
+    let emotion_data_aggregate: Record<string, number> = {};
+    for (const key in emotion_data) {
+      if (emotion_data.hasOwnProperty(key)) {
+        const element = emotion_data[key];
+        if (Object.keys(emotion_data_aggregate).includes(element)) {
+          emotion_data_aggregate[element] += 1;
+          continue;
+        }
+        emotion_data_aggregate[element] = 1;
+      }
+    }
+    // @ts-ignore
+    const [max_key, max_value] = getMaxKey(emotion_data_aggregate);
+    console.log(max_key, max_value);
+    const dominant_emotion = max_key.charAt(0).toUpperCase() + max_key.slice(1);
+    const dominant_emotion_percentage = (max_value / 9) * 100;
+    let temp = {
+      id: e.id,
+      tag: e.tag,
+      office_name: metadata.office_name,
+      mean_rating: mean_rating.toFixed(2),
+      mean_rating_percent: mean_rating_percentage.toFixed(0),
+      overall_emotion: dominant_emotion,
+      overall_emotion_percent: dominant_emotion_percentage.toFixed(0),
+      ...inner_parsed_data,
+    };
+    output.push(temp);
+  });
+  return output;
+};
+
+export { parse_feedback_data, stats_parser, history_parser };
