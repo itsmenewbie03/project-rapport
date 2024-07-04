@@ -11,9 +11,9 @@
     </a>
   </li>
   <li>
-    <a href="/configurations">
-      <Icon name="configurations" _class="size-5" />
-      Configure System
+    <a href="/history">
+      <Icon name="history" _class="size-5" />
+      View History
     </a>
   </li>
   <li>
