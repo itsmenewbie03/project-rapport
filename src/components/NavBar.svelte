@@ -65,6 +65,7 @@
         >
           <li><a href="/dashboard">Dashboard</a></li>
           <li><a href="/analytics">Analytics</a></li>
+          <li><a href="/history">History</a></li>
           <li><a href="/configurations">Configurations</a></li>
         </ul>
       </div>
