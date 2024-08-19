@@ -10,6 +10,7 @@
   import { invoke } from "@tauri-apps/api/tauri";
   import { confirm } from "@tauri-apps/api/dialog";
   import { gen_uuid } from "$lib/uuids";
+  import RatingTest from "$components/RatingTest.svelte";
 
   let loaded: boolean = false;
   let uuid: string = "";
@@ -307,7 +308,9 @@
     {#if loaded}
       {#if $page.data.session}
         <div class="px-14 py-4">
-          {#if !client_type || !purpose_of_visit || !initial_step_done}
+          <!-- {#if !client_type || !purpose_of_visit || !initial_step_done} -->
+          <!-- TODO: remove this switch  -->
+          {#if false}
             <p class="text-xl font-bold">Name</p>
             <input
               type="text"
@@ -419,14 +422,13 @@
                   description="This feedback scale uses colors! Red means very unhappy, orange unhappy, yellow okay, lime happy, and green very happy."
                 />
               </div>
-
-              <p class="text-md">
-                This feedback scale uses colors! <b>
-                  From left to right, the hearts represent a scale of 1 to 5.
-                  Red means very unhappy, orange unhappy, yellow okay, lime
-                  happy, and green very happy.</b
-                >
-              </p>
+              <div class="flex flex-row gap-4">
+                <RatingTest label="MWA" rating="very_dissatisfied" />
+                <RatingTest label="MWA" rating="dissatisfied" />
+                <RatingTest label="MWA" rating="neutral" />
+                <RatingTest label="MWA" rating="satisfied" />
+                <RatingTest label="MWA" rating="very_satisfied" />
+              </div>
               <div class="flex flex-col gap-y-1">
                 <div
                   class="rating rating-lg gap-8 grid grid-cols-2 flex-inline items-center"
