@@ -423,11 +423,36 @@
                 />
               </div>
               <div class="flex flex-row gap-4">
-                <RatingTest label="MWA" rating="very_dissatisfied" />
-                <RatingTest label="MWA" rating="dissatisfied" />
-                <RatingTest label="MWA" rating="neutral" />
-                <RatingTest label="MWA" rating="satisfied" />
-                <RatingTest label="MWA" rating="very_satisfied" />
+                <RatingTest
+                  bind:group={responsiveness}
+                  label="MWA"
+                  value={1}
+                  rating="very_dissatisfied"
+                />
+                <RatingTest
+                  bind:group={responsiveness}
+                  label="MWA"
+                  value={2}
+                  rating="dissatisfied"
+                />
+                <RatingTest
+                  bind:group={responsiveness}
+                  label="MWA"
+                  value={3}
+                  rating="neutral"
+                />
+                <RatingTest
+                  bind:group={responsiveness}
+                  label="MWA"
+                  value={4}
+                  rating="satisfied"
+                />
+                <RatingTest
+                  bind:group={responsiveness}
+                  label="MWA"
+                  value={5}
+                  rating="very_satisfied"
+                />
               </div>
               <div class="flex flex-col gap-y-1">
                 <div
