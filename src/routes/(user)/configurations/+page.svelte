@@ -13,10 +13,15 @@
   let email_recipient: string = "email@example.com";
   let office_name: string = "NOT CONFIGURED YET";
   let enable_consent_screen: string = "false";
+  let services_list: string[] = [];
 
   type ConfigData = {
     name: string;
     value: string;
+  };
+
+  type ServiceData = {
+    name: string;
   };
 
   const save = async (event: Event) => {
@@ -40,12 +45,51 @@
       toast.error(err);
     }
   };
+
+  const add_service = async (event: Event) => {
+    let service = prompt("Please enter the service you want to add.");
+    if (!service) {
+      return;
+    }
+    let service_cleaned = service.trim();
+    if (!service_cleaned.length) {
+      toast.error("Service must be not be all whitespaces.");
+      return;
+    }
+    if (service_cleaned.length < 5) {
+      toast.error("Service must be at least 5 characters.");
+      return;
+    }
+    try {
+      const resp: string = await invoke("add_service", {
+        service: service_cleaned,
+      });
+      services_list.push(service_cleaned);
+      services_list = services_list;
+      alert(resp);
+    } catch (err: any) {
+      console.error("ADD_SERVICE", err);
+    }
+  };
+
+  const load_services = async () => {
+    try {
+      const services: ServiceData[] = await invoke("get_services");
+      services.forEach((service) => {
+        services_list.push(service.name);
+      });
+      console.log("SERVICES", services_list);
+    } catch (err: any) {
+      console.error("SERVICES", err);
+    }
+  };
+
   onMount(async () => {
     if (!$page.data.session) {
       toast.error("Please login first.");
       await goto("/login");
     }
-
+    await load_services();
     try {
       const configs: ConfigData[] = await invoke("get_configs");
       configs.forEach((config) => {
@@ -125,6 +169,33 @@
               >
             </div>
           </label>
+          <div class="label">
+            <span class="label-text">Services Offered</span>
+          </div>
+          <div class="flex flex-row gap-1">
+            <ul class="menu bg-base-200 rounded-box rounded-r-none w-full">
+              <li>
+                <details>
+                  <summary>List of Services Offered</summary>
+                  <ul>
+                    {#each services_list as service}
+                      <li><a href="##">{service}</a></li>
+                    {/each}
+                    <li></li>
+                  </ul>
+                </details>
+              </li>
+            </ul>
+            <button
+              class="btn btn-primary rounded-l-none min-h-[52px]"
+              on:click={add_service}>Add Service</button
+            >
+          </div>
+          <div class="label">
+            <span class="label-text-alt"
+              >The services offered by this office.</span
+            >
+          </div>
           <label class="form-control w-full">
             <div class="label">
               <span class="label-text">Consent Screen</span>
@@ -157,7 +228,8 @@
               >
             </div>
           </label>
-          <button class="btn btn-primary mt-2 w-20" on:click={save}>Save</button
+          <button class="btn btn-primary mt-2 w-20 mb-20" on:click={save}
+            >Save</button
           >
         </div>
       {:else}
