@@ -9,6 +9,7 @@ use utils::auth::models::UserData;
 use utils::db;
 use utils::jwt;
 use utils::jwt::Claims;
+use utils::models::ServiceData;
 
 use crate::utils::{
     alerts, faau,
@@ -171,6 +172,23 @@ async fn get_configs() -> Result<Vec<ConfigData>, String> {
 }
 
 #[tauri::command]
+async fn get_services() -> Result<Vec<ServiceData>, String> {
+    match db::get_services().await {
+        Some(services) => Ok(services),
+        None => Err("No services added yet!".to_owned()),
+    }
+}
+
+#[tauri::command]
+async fn add_service(service: &str) -> Result<String, String> {
+    if db::add_service(service).await {
+        Ok("Service added successfully!".to_owned())
+    } else {
+        Err("Failed to add service!".to_owned())
+    }
+}
+
+#[tauri::command]
 async fn save_configs(data: HashMap<String, String>) -> Result<String, String> {
     if db::save_configs(data).await {
         Ok("Config saved successfully".to_owned())
@@ -267,7 +285,9 @@ fn main() {
             update_profile,
             change_password,
             get_feedbacks,
-            generate_report
+            generate_report,
+            get_services,
+            add_service
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
