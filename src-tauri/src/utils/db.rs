@@ -8,6 +8,8 @@ use crate::utils::{
 use sqlx::{migrate::MigrateDatabase, Sqlite, SqlitePool};
 use tokio::runtime::Runtime;
 
+use super::models::ServiceData;
+
 const DB_URL: &str = "sqlite://sqlite.db";
 
 async fn get_db_connection() -> Result<sqlx::Pool<Sqlite>, sqlx::Error> {
@@ -68,6 +70,17 @@ pub async fn init() {
                 id    INTEGER PRIMARY KEY AUTOINCREMENT,
                 name  TEXT NOT NULL UNIQUE,
                 value TEXT
+        );",
+    )
+    .execute(&db)
+    .await
+    .unwrap();
+
+    // INFO: create services table
+    let _result = sqlx::query(
+        "CREATE TABLE IF NOT EXISTS services (
+                id    INTEGER PRIMARY KEY AUTOINCREMENT,
+                name  TEXT NOT NULL UNIQUE
         );",
     )
     .execute(&db)
@@ -146,6 +159,30 @@ pub async fn save_configs(config: HashMap<String, String>) -> bool {
         }
     }
     true
+}
+
+pub async fn get_services() -> Option<Vec<ServiceData>> {
+    let db = get_db_connection().await.unwrap();
+    let services = sqlx::query_as::<_, ServiceData>("SELECT * FROM services;")
+        .fetch_all(&db)
+        .await
+        .unwrap();
+    if services.is_empty() {
+        return None;
+    }
+    Some(services)
+}
+
+pub async fn add_service(service: &str) -> bool {
+    let db = get_db_connection().await.unwrap();
+    let result = sqlx::query("INSERT INTO services (name) VALUES (?)")
+        .bind(service)
+        .execute(&db)
+        .await;
+    match result {
+        Ok(res) => res.rows_affected() == 1,
+        Err(_) => false,
+    }
 }
 
 pub async fn update_profile(email: &str, data: HashMap<String, String>) -> bool {
