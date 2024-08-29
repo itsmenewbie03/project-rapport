@@ -10,7 +10,6 @@
   import { invoke } from "@tauri-apps/api/tauri";
   import { confirm } from "@tauri-apps/api/dialog";
   import { gen_uuid } from "$lib/uuids";
-  import SmileyRating from "$components/SmileyRating.svelte";
   import SmileyRatingBar from "$components/SmileyRatingBar.svelte";
 
   let loaded: boolean = false;
@@ -24,6 +23,25 @@
   let name: string = "";
   let purpose_of_visit: string = "";
   let initial_step_done = false;
+
+  let services_list: string[] = [];
+
+  let suggested_services: string[] = [];
+  let accepted_suggestion: boolean = false;
+  type ServiceData = {
+    name: string;
+  };
+
+  const filter_services = () => {
+    accepted_suggestion = false;
+    suggested_services = services_list.filter((e) => {
+      return (
+        e.toLowerCase().startsWith(purpose_of_visit.toLowerCase().trim()) &&
+        purpose_of_visit.length > 0
+      );
+    });
+    console.log("FILTERD", suggested_services);
+  };
 
   // INFO: Thank You Modal Stuff
   let modal_handle: any;
@@ -101,6 +119,19 @@
         await take_photo("overall_satisfaction");
       }
     })();
+
+  const load_services = async () => {
+    try {
+      const services: ServiceData[] = await invoke("get_services");
+      services.forEach((service) => {
+        services_list.push(service.name);
+      });
+      console.log("SERVICES", services_list);
+    } catch (err: any) {
+      console.error("SERVICES", err);
+    }
+  };
+
   // NOTE:
   // key: quality, value: dominant_emotion
   const emotion_data: Record<string, string> = {};
@@ -256,6 +287,7 @@
       await goto("/feedback/consent");
       return;
     }
+    await load_services();
     // TEST: for aesthetics we will delay the load for a second xD
     setTimeout(() => {
       loaded = true;
@@ -309,9 +341,7 @@
     {#if loaded}
       {#if $page.data.session}
         <div class="px-14 py-4">
-          <!-- {#if !client_type || !purpose_of_visit || !initial_step_done} -->
-          <!-- TODO: remove this switch  -->
-          {#if false}
+          {#if !client_type || !purpose_of_visit || !initial_step_done}
             <p class="text-xl font-bold">Name</p>
             <input
               type="text"
@@ -403,8 +433,30 @@
               type="text"
               placeholder="Enter your purpose of visit here..."
               bind:value={purpose_of_visit}
+              on:input={filter_services}
               class="input input-bordered w-full mt-1"
             />
+            {#if suggested_services.length > 0 && !accepted_suggestion}
+              <div class="dropdown dropdown-open">
+                <ul
+                  tabindex="-1"
+                  class="dropdown-content menu bg-base-200 rounded-box z-[1] w-64 mt-[-15px] p-2"
+                >
+                  {#each suggested_services as service}
+                    <li>
+                      <a
+                        role="button"
+                        href="##"
+                        on:click={() => {
+                          purpose_of_visit = service;
+                          accepted_suggestion = true;
+                        }}>{service}</a
+                      >
+                    </li>
+                  {/each}
+                </ul>
+              </div>
+            {/if}
             <div class="mt-4">
               <button
                 class="btn btn-primary"

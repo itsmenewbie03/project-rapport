@@ -8,6 +8,11 @@ pub struct ConfigData {
 }
 
 #[derive(Serialize, Clone, FromRow, Debug)]
+pub struct ServiceData {
+    pub name: String,
+}
+
+#[derive(Serialize, Clone, FromRow, Debug)]
 pub struct FeedbackDataRow {
     pub id: i32,
     pub data: String,
