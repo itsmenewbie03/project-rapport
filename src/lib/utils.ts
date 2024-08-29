@@ -20,6 +20,6 @@ const logout = async (): Promise<void> => {
       resolve();
     }, 1000);
   });
-}
+};
 
 export { _goto as goto, logout };

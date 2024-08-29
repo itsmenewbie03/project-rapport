@@ -7,6 +7,7 @@
   import toast from "svelte-french-toast";
   import { invoke } from "@tauri-apps/api/tauri";
   import { validate_email as is_valid_email } from "$lib/email_validator";
+  import { ask, confirm } from "@tauri-apps/api/dialog";
   let loaded: boolean = false;
 
   let max_negative_feedback: number = 3;
@@ -66,7 +67,7 @@
       });
       services_list.push(service_cleaned);
       services_list = services_list;
-      alert(resp);
+      toast.success(resp);
     } catch (err: any) {
       console.error("ADD_SERVICE", err);
     }
@@ -81,6 +82,67 @@
       console.log("SERVICES", services_list);
     } catch (err: any) {
       console.error("SERVICES", err);
+    }
+  };
+  // FIX: the code below is an absolute dogshit
+  // but we don't have enough time to clean code it xD
+  const service_action_prompt = async (service: string) => {
+    const should_delete = await ask(
+      "What action do you want to take? If you want none just click edit and click cancel.",
+      {
+        title: "Select Action",
+        okLabel: "Delete",
+        cancelLabel: "Edit",
+      },
+    );
+    // INFO: handle delete case
+    if (should_delete) {
+      const confirmed = await confirm(
+        "This action cannot be undone, please click OK if you want to proceed.",
+        `Are you sure you want to delete ${service}?`,
+      );
+      if (confirmed) {
+        // TODO: implement delete function
+        try {
+          const resp: string = await invoke("delete_service", { service });
+          toast.success(resp);
+          // INFO: why tf arr.remove or arr.popAt does not exists?
+          services_list.splice(services_list.indexOf(service), 1);
+          services_list = services_list;
+        } catch (err: any) {
+          toast.error(err);
+        }
+      }
+      return;
+    }
+    // INFO: handle edit case
+    let edited_service = prompt("Please enter new service name.", service);
+    if (!edited_service) {
+      return;
+    }
+    let edited_service_cleaned = edited_service.trim();
+    if (!edited_service_cleaned.length) {
+      toast.error("Service must be not be all whitespaces.");
+      return;
+    }
+    if (edited_service_cleaned.length < 5) {
+      toast.error("Service must be at least 5 characters.");
+      return;
+    }
+    if (edited_service_cleaned === service) {
+      toast.error("No change was made.");
+      return;
+    }
+    // INFO: implement edit function
+    try {
+      const resp: string = await invoke("edit_service", {
+        target: service,
+        update: edited_service_cleaned,
+      });
+      toast.success(resp);
+      services_list[services_list.indexOf(service)] = edited_service_cleaned;
+    } catch (err: any) {
+      toast.error(err);
     }
   };
 
@@ -179,7 +241,17 @@
                   <summary>List of Services Offered</summary>
                   <ul>
                     {#each services_list as service}
-                      <li><a href="##">{service}</a></li>
+                      <!-- NOTE: idc about a11y on this case -->
+                      <!-- svelte-ignore a11y-missing-attribute -->
+                      <!-- svelte-ignore a11y-click-events-have-key-events -->
+                      <!-- svelte-ignore a11y-no-static-element-interactions -->
+                      <li>
+                        <a
+                          on:click={() => {
+                            service_action_prompt(service);
+                          }}>{service}</a
+                        >
+                      </li>
                     {/each}
                     <li></li>
                   </ul>
