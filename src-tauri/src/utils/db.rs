@@ -185,6 +185,31 @@ pub async fn add_service(service: &str) -> bool {
     }
 }
 
+pub async fn delete_service(service: &str) -> bool {
+    let db = get_db_connection().await.unwrap();
+    let result = sqlx::query("DELETE FROM services WHERE name = ?")
+        .bind(service)
+        .execute(&db)
+        .await;
+    match result {
+        Ok(res) => res.rows_affected() == 1,
+        Err(_) => false,
+    }
+}
+
+pub async fn edit_service(target: &str, update: &str) -> bool {
+    let db = get_db_connection().await.unwrap();
+    let result = sqlx::query("UPDATE services SET name = ? WHERE name = ?")
+        .bind(update)
+        .bind(target)
+        .execute(&db)
+        .await;
+    match result {
+        Ok(res) => res.rows_affected() == 1,
+        Err(_) => false,
+    }
+}
+
 pub async fn update_profile(email: &str, data: HashMap<String, String>) -> bool {
     let db = get_db_connection().await.unwrap();
     let user = get_user(email).await;
