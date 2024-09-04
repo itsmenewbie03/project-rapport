@@ -12,3 +12,4 @@ sqlite.db*
 pyrightconfig.json
 start_pybackend.sh
 *.png
+test
