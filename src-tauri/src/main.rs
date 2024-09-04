@@ -9,6 +9,7 @@ use utils::auth::models::UserData;
 use utils::db;
 use utils::jwt;
 use utils::jwt::Claims;
+use utils::models::DateRangeFilter;
 use utils::models::ServiceData;
 
 use crate::utils::{
@@ -253,7 +254,7 @@ async fn get_feedbacks(class: &str) -> Result<String, String> {
 }
 
 #[tauri::command]
-async fn generate_report() -> Result<String, String> {
+async fn generate_report(start: &str, end: &str) -> Result<String, String> {
     let configs = db::get_configs().await;
     if configs.is_none() {
         return Err("Failed to load configs!".to_owned());
@@ -272,7 +273,9 @@ async fn generate_report() -> Result<String, String> {
         notifications::warn("Email Recipient is not configured. Report will not be sent");
         return Err("Email Recipient is not configured. Report will not be sent".to_owned());
     }
-    let feedback_data = db::get_feedbacks(FeedbackType::Hybrid).await;
+
+    let filter = DateRangeFilter { start, end };
+    let feedback_data = db::get_filtered_feedbacks(FeedbackType::Hybrid, filter).await;
     if feedback_data.is_none() {
         return Err("No feedback data available.".to_owned());
     }

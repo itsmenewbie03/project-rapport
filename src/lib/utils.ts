@@ -22,4 +22,8 @@ const logout = async (): Promise<void> => {
   });
 };
 
-export { _goto as goto, logout };
+const to_timestamp = (date: string): number => {
+  return new Date(date).getTime();
+};
+
+export { _goto as goto, logout, to_timestamp }
