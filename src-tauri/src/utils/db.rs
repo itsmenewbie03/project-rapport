@@ -8,7 +8,7 @@ use crate::utils::{
 use sqlx::{migrate::MigrateDatabase, Sqlite, SqlitePool};
 use tokio::runtime::Runtime;
 
-use super::models::ServiceData;
+use super::models::{DateRangeFilter, ServiceData};
 
 const DB_URL: &str = "sqlite://sqlite.db";
 
@@ -41,10 +41,10 @@ pub async fn init() {
     // INFO: create trad_feedback_data table
     let _result = sqlx::query(
         "CREATE TABLE IF NOT EXISTS trad_feedback_data (
-                id         INTEGER PRIMARY KEY AUTOINCREMENT,
-                data       TEXT NOT NULL,
-                tag        TEXT NOT NULL,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                data        TEXT NOT NULL,
+                tag         TEXT NOT NULL,
+                created_at  INTEGER DEFAULT (strftime('%s', 'now', 'localtime'))
         );",
     )
     .execute(&db)
@@ -57,7 +57,7 @@ pub async fn init() {
                 id         INTEGER PRIMARY KEY AUTOINCREMENT,
                 data       TEXT NOT NULL,
                 tag        TEXT NOT NULL,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                created_at INTEGER DEFAULT (strftime('%s', 'now', 'localtime'))
         );",
     )
     .execute(&db)
@@ -299,6 +299,37 @@ pub async fn get_feedbacks(feedback_type: FeedbackType) -> Option<Vec<FeedbackDa
         .fetch_all(&db)
         .await
         .unwrap();
+    if feedbacks.is_empty() {
+        return None;
+    }
+    Some(feedbacks)
+}
+
+pub async fn get_filtered_feedbacks(
+    feedback_type: FeedbackType,
+    filter: DateRangeFilter<'_>,
+) -> Option<Vec<FeedbackDataRow>> {
+    let table = match feedback_type {
+        FeedbackType::Trad => "trad_feedback_data",
+        FeedbackType::Hybrid => "hybrid_feedback_data",
+    };
+    let db = get_db_connection().await.unwrap();
+    // WARN: hey do SQL injection here please xD
+    // note idk if SQL is stupid to make my query go wrong
+    // this is timestamp based query so yeah
+    let query = format!(
+        "SELECT * FROM {} WHERE datetime(created_at,'unixepoch') BETWEEN datetime({},'unixepoch') AND datetime({},'unixepoch')",
+        // NOTE: the end will be set to the midnight of next day
+        table,
+        filter.start,
+        filter.end
+    );
+    println!("[RUST]: FEEDBACK FILTER QUERY -> {}", query);
+    let feedbacks = sqlx::query_as::<_, FeedbackDataRow>(&query)
+        .fetch_all(&db)
+        .await
+        .unwrap();
+    println!("[RUST]: FILETERED RESULT -> {:#?}", feedbacks);
     if feedbacks.is_empty() {
         return None;
     }
