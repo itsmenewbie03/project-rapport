@@ -247,10 +247,11 @@ pub async fn change_password(email: &str, new_password: &str) -> bool {
     }
 }
 
-pub async fn save_trad_feedback(data: &str) -> bool {
+pub async fn save_trad_feedback(data: &str, tag: &str) -> bool {
     let db = get_db_connection().await.unwrap();
-    let result = sqlx::query("INSERT INTO trad_feedback_data (data) VALUES (?)")
+    let result = sqlx::query("INSERT INTO trad_feedback_data (data,tag) VALUES (?,?)")
         .bind(data)
+        .bind(tag)
         .execute(&db)
         .await;
     match result {

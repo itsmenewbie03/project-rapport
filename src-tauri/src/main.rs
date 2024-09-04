@@ -111,7 +111,24 @@ async fn submit_feedback(
             if !recording {
                 // NOTE: when the user did not allowed recording
                 // we have nothing lef to do but store the feedback data
-                feedback_data.save_to_db(FeedbackType::Trad).await;
+                println!("[RUST]: feedback submitted without recording will save to trad!");
+                let feedback_mean = feedback_data.mean();
+                // NOTE: adapted from
+                // 5.   4.21 - 5.00   VS
+                // 4.   3.41 - 4.20   S
+                // 3.   2.61 - 3.40   NEUTRAL
+                // 2.   1.81 - 2.60   D
+                // 1.   1.00 - 1.80   VD
+                let feedback_category = if feedback_mean >= 3.41 {
+                    "positive"
+                } else if feedback_mean < 2.61 {
+                    "negative"
+                } else {
+                    "neutral"
+                };
+                feedback_data
+                    .save_to_db(FeedbackType::Trad, feedback_category)
+                    .await;
                 return Ok("Feedback submitted successfully".to_owned());
             };
             // INFO: we will only need to stop recording

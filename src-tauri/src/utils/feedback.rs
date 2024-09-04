@@ -53,10 +53,10 @@ impl FeedbackData {
             .expect("Failed to write feedback data to file");
     }
 
-    pub async fn save_to_db(&self, feedback_type: FeedbackType) -> bool {
+    pub async fn save_to_db(&self, feedback_type: FeedbackType, tag: &str) -> bool {
         let data = serde_json::to_string(self).unwrap();
         match feedback_type {
-            FeedbackType::Trad => db::save_trad_feedback(&data).await,
+            FeedbackType::Trad => db::save_trad_feedback(&data, tag).await,
             // WARN: we are heavily redesigning the system
             // the follow line will not get called
             // if it get's called then we will tag it as UNTAGGED
