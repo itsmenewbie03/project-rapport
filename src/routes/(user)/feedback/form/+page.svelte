@@ -43,6 +43,26 @@
     console.log("FILTERD", suggested_services);
   };
 
+  const clear_form = (event: Event) => {
+    name = "";
+    contact_number = "";
+    client_type = "";
+    other_client_type = "";
+    purpose_of_visit = "";
+  };
+
+  const clear_scores = (event: Event) => {
+    responsiveness = 0;
+    reliability = 0;
+    access_and_facilities = 0;
+    communication = 0;
+    value_for_money = 0;
+    integrity = 0;
+    assurance = 0;
+    outcome = 0;
+    overall_satisfaction = 0;
+  };
+
   // INFO: Thank You Modal Stuff
   let modal_handle: any;
   let message: string = "";
@@ -281,9 +301,11 @@
       toast.error("Session expired, please start from the beginning.");
       // HACK: stop the recording just in case the user reloads the feedback page.
       // why do we have to suffer for their mistakes? xD
-      await invoke("clear_recording", {
-        id: "I DON'T HAVE ENOUGH TIME TO IMPLEMENT THIS PROPERLY xD!",
-      });
+      if (recording) {
+        await invoke("clear_recording", {
+          id: "I DON'T HAVE ENOUGH TIME TO IMPLEMENT THIS PROPERLY xD!",
+        });
+      }
       await goto("/feedback/consent");
       return;
     }
@@ -342,7 +364,30 @@
       {#if $page.data.session}
         <div class="px-14 py-4">
           {#if !client_type || !purpose_of_visit || !initial_step_done}
-            <p class="text-xl font-bold">Name</p>
+            <button
+              class="btn btn-ghost btn-sm underline"
+              on:click={async () => {
+                dont_stop = true;
+                await goto("/feedback/consent");
+              }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M15.75 19.5 8.25 12l7.5-7.5"
+                />
+              </svg>
+              Back</button
+            >
+            <p class="text-xl font-bold mt-2">Name</p>
             <input
               type="text"
               placeholder="Optional"
@@ -458,8 +503,11 @@
               </div>
             {/if}
             <div class="mt-4">
+              <button class="btn btn-error min-w-20" on:click={clear_form}
+                >Clear</button
+              >
               <button
-                class="btn btn-primary"
+                class="btn btn-primary min-w-20"
                 on:click={initial_submit}
                 disabled={!client_type ||
                   !purpose_of_visit ||
@@ -467,8 +515,30 @@
               >
             </div>
           {:else}
+            <button
+              class="btn btn-ghost btn-sm underline"
+              on:click={() => {
+                initial_step_done = false;
+              }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M15.75 19.5 8.25 12l7.5-7.5"
+                />
+              </svg>
+              Back</button
+            >
             <div>
-              <div class="flex flex-inline items-center">
+              <div class="flex flex-inline items-center mt-2">
                 <p class="text-2xl font-bold">Tell us what you think!</p>
                 <QuickTip
                   title="Rating"
@@ -566,12 +636,14 @@
                 </div>
               </div>
             </div>
-            <button
-              class="btn btn-primary float-end mt-4 mb-16"
-              on:click={submit}
-            >
-              Submit
-            </button>
+            <div class="float-end">
+              <button class="btn btn-error mt-4 mb-16" on:click={clear_scores}
+                >Clear
+              </button>
+              <button class="btn btn-primary mt-4 mb-16" on:click={submit}>
+                Submit
+              </button>
+            </div>
           {/if}
         </div>
       {:else}
