@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::utils::{
     auth::models::User,
     feedback::FeedbackType,
-    models::{ConfigData, FeedbackDataRow},
+    models::{ArtifactRow, ConfigData, FeedbackDataRow},
 };
 use sqlx::{migrate::MigrateDatabase, Sqlite, SqlitePool};
 use tokio::runtime::Runtime;
@@ -51,9 +51,35 @@ pub async fn init() {
     .await
     .unwrap();
 
+    // INFO: create archived_trad_feedback_data table
+    let _result = sqlx::query(
+        "CREATE TABLE IF NOT EXISTS archived_trad_feedback_data (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                data        TEXT NOT NULL,
+                tag         TEXT NOT NULL,
+                created_at  INTEGER DEFAULT (strftime('%s', 'now', 'localtime'))
+        );",
+    )
+    .execute(&db)
+    .await
+    .unwrap();
+
     // INFO: create hybrid_feedback_data table
     let _result = sqlx::query(
         "CREATE TABLE IF NOT EXISTS hybrid_feedback_data (
+                id         INTEGER PRIMARY KEY AUTOINCREMENT,
+                data       TEXT NOT NULL,
+                tag        TEXT NOT NULL,
+                created_at INTEGER DEFAULT (strftime('%s', 'now', 'localtime'))
+        );",
+    )
+    .execute(&db)
+    .await
+    .unwrap();
+
+    // INFO: create archived_hybrid_feedback_data table
+    let _result = sqlx::query(
+        "CREATE TABLE IF NOT EXISTS archived_hybrid_feedback_data (
                 id         INTEGER PRIMARY KEY AUTOINCREMENT,
                 data       TEXT NOT NULL,
                 tag        TEXT NOT NULL,
@@ -111,7 +137,7 @@ pub async fn init() {
         }
         println!("[RUST]: default admin created!");
         println!("[RUST]: Fresh database initialization completed!");
-        // NOTE: we can get rid of the return by ommitting the semi-colon on the line above
+        // NOTE: we can get rid of the return by omitting the semi-colon on the line above
         // but that way is kinda hard to tell the we're doing an early return
         return;
     }
@@ -310,10 +336,7 @@ pub async fn get_filtered_feedbacks(
     feedback_type: FeedbackType,
     filter: DateRangeFilter<'_>,
 ) -> Option<Vec<FeedbackDataRow>> {
-    let table = match feedback_type {
-        FeedbackType::Trad => "trad_feedback_data",
-        FeedbackType::Hybrid => "hybrid_feedback_data",
-    };
+    let table = feedback_type.to_string();
     let db = get_db_connection().await.unwrap();
     // WARN: hey do SQL injection here please xD
     // note idk if SQL is stupid to make my query go wrong
@@ -335,4 +358,88 @@ pub async fn get_filtered_feedbacks(
         return None;
     }
     Some(feedbacks)
+}
+#[tokio::test]
+async fn get_artifacts_test() {
+    let feedback_type = FeedbackType::Hybrid;
+    let db = get_db_connection().await.unwrap();
+    let table = match feedback_type {
+        FeedbackType::Trad => "trad_feedback_data",
+        FeedbackType::Hybrid => "hybrid_feedback_data",
+    };
+    let query = &format!(
+        // WARN: change to 5 * 365 instead of 1
+        "SELECT id FROM {} WHERE unixepoch('now','localtime') - created_at >= 1 * 24 * 60 * 60",
+        table
+    );
+    let artifacts = sqlx::query_as::<_, ArtifactRow>(query)
+        .fetch_all(&db)
+        .await
+        .unwrap();
+    println!("[RUST]: Artifacts of {} -> {:#?}", table, artifacts);
+}
+
+async fn get_artifacts(feedback_type: &FeedbackType) -> Option<Vec<ArtifactRow>> {
+    let db = get_db_connection().await.unwrap();
+    let table = feedback_type.to_string();
+    let query = &format!(
+        "SELECT id FROM {} WHERE unixepoch('now','localtime') - created_at >= 5 * 365 * 24 * 60 * 60",
+        table
+    );
+    let artifacts = sqlx::query_as::<_, ArtifactRow>(query)
+        .fetch_all(&db)
+        .await
+        .unwrap_or_else(|x| {
+            println!("[RUST]: we got {:?} so we will return an empty vec", x);
+            vec![]
+        });
+
+    if artifacts.is_empty() {
+        return None;
+    }
+    Some(artifacts)
+}
+
+pub async fn archive_feedbacks() -> usize {
+    let tables = [FeedbackType::Trad, FeedbackType::Hybrid];
+    let mut archived_count = 0;
+    for table in tables {
+        let db = get_db_connection().await.unwrap();
+        let artifacts = get_artifacts(&table).await;
+        if artifacts.is_none() {
+            // INFO: we have nothing to do
+            // so we will move to the next table
+            continue;
+        }
+        let artifacts = artifacts.unwrap();
+        let ids = artifacts
+            .iter()
+            .map(|x| x.id.to_string())
+            .collect::<Vec<String>>()
+            .join(", ");
+        let move_query = &format!(
+            "INSERT INTO archived_{} SELECT * FROM {} WHERE id IN ({})",
+            table, table, ids
+        );
+        let result = sqlx::query(move_query).execute(&db).await.unwrap();
+        if result.rows_affected() == 0 {
+            // INFO: we failed to move the data
+            // so we will skip the deletion
+            continue;
+        }
+        println!(
+            "[RUST]: {} data moved successfully from {}!",
+            result.rows_affected(),
+            table
+        );
+        let delete_query = &format!("DELETE FROM {} WHERE id IN ({})", table, ids);
+        let result = sqlx::query(delete_query).execute(&db).await.unwrap();
+        if result.rows_affected() == 0 {
+            continue;
+        }
+        println!("[RUST]: {} deleted from {}!", result.rows_affected(), table);
+        // NOTE: we will only increase the archived count if the operation succeeded
+        archived_count += &artifacts.len();
+    }
+    archived_count
 }
