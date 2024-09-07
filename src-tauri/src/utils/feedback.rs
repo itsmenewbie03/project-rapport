@@ -1,6 +1,7 @@
 use crate::utils::db;
-use std::{collections::HashMap, fs::File, io::Write};
+use std::{collections::HashMap, fmt::Display, fs::File, io::Write};
 
+#[derive(Debug)]
 pub enum FeedbackType {
     Trad,
     Hybrid,
@@ -12,6 +13,15 @@ impl FeedbackType {
             "trad" => Ok(FeedbackType::Trad),
             "hybrid" => Ok(FeedbackType::Hybrid),
             _ => Err("Invalid feedback type".to_string()),
+        }
+    }
+}
+
+impl Display for FeedbackType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match *self {
+            FeedbackType::Trad => write!(f, "trad_feedback_data"),
+            FeedbackType::Hybrid => write!(f, "hybrid_feedback_data"),
         }
     }
 }

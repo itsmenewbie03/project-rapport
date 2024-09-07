@@ -14,10 +14,17 @@ pub struct ServiceData {
 
 #[derive(Serialize, Clone, FromRow, Debug)]
 pub struct FeedbackDataRow {
-    pub id: i32,
+    pub id: u32,
     pub data: String,
     pub tag: String,
     pub created_at: u32,
+}
+
+// NOTE: we will use this to store the ID of Row
+// that we will archive
+#[derive(Serialize, Clone, FromRow, Debug)]
+pub struct ArtifactRow {
+    pub id: u32,
 }
 
 // NOTE: i wrote some lifetimes for the first time

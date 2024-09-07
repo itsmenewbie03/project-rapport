@@ -8,7 +8,24 @@
   import toast from "svelte-french-toast";
   import Stats from "$components/Stats.svelte";
   import ReportGenerator from "$components/ReportGenerator.svelte";
+  import ExtraUtils from "$components/ExtraUtils.svelte";
+  import { invoke } from "@tauri-apps/api/tauri";
   let loaded: boolean = false;
+  let archiving: boolean = false;
+  let handle: HTMLButtonElement;
+
+  const start_archiving = async () => {
+    archiving = true;
+    try {
+      const resp: string = await invoke("start_archive");
+      toast.success(resp);
+    } catch (err: any) {
+      toast.error(err);
+    } finally {
+      archiving = false;
+      handle.blur();
+    }
+  };
 
   onMount(async () => {
     if (!$page.data.session) {
@@ -29,6 +46,11 @@
         <div class="px-14 py-4">
           <div class="flex flex-row gap-6">
             <DashboardQuickMenu />
+            <ExtraUtils
+              bind:loading={archiving}
+              click={start_archiving}
+              bind:handle
+            />
             <Stats />
           </div>
           <ReportGenerator />

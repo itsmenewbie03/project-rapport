@@ -7,6 +7,7 @@ use std::collections::HashMap;
 use utils::auth::is_credentials_valid;
 use utils::auth::models::UserData;
 use utils::db;
+use utils::db::archive_feedbacks;
 use utils::jwt;
 use utils::jwt::Claims;
 use utils::models::DateRangeFilter;
@@ -271,6 +272,16 @@ async fn get_feedbacks(class: &str) -> Result<String, String> {
 }
 
 #[tauri::command]
+async fn start_archive() -> Result<String, String> {
+    let archive_count = archive_feedbacks().await;
+    if archive_count > 0 {
+        Ok(format!("Archived {} records successfully!", archive_count))
+    } else {
+        Err("No data to archive.".to_owned())
+    }
+}
+
+#[tauri::command]
 async fn generate_report(start: &str, end: &str) -> Result<String, String> {
     let configs = db::get_configs().await;
     if configs.is_none() {
@@ -327,7 +338,8 @@ fn main() {
             get_services,
             add_service,
             delete_service,
-            edit_service
+            edit_service,
+            start_archive
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
