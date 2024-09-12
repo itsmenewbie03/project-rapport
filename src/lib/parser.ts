@@ -1,9 +1,11 @@
 // @ts-ignore
 import HRNumbers from "human-readable-numbers";
 type FeedbackType = "trad" | "hybrid";
+
 const parse_feedback_data = (feedback_type: FeedbackType, data: string) => {
   return feedback_type == "trad" ? trad_parser(data) : hybrid_parser(data);
 };
+
 // WARN: this code is high voltage xD
 // DO NOT TOUCH YOU WILL BE FIRED !!!!!!!
 const getMaxKey = (
@@ -76,6 +78,7 @@ const vizzu_parser = (data: object[]) => {
   idx_table.forEach((e) => {
     emotion_data_aggregate[e] = new Array(7).fill(0);
   });
+
   data.forEach((e: any) => {
     const feedback_data = e.feedback_data;
     for (const key in feedback_data) {
@@ -95,6 +98,7 @@ const vizzu_parser = (data: object[]) => {
       }
     }
   });
+
   let vizzu_data = {
     series: [
       { name: "Quality", values: arr },

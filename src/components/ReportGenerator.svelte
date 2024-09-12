@@ -11,6 +11,7 @@
   let end_date_input: HTMLInputElement;
   let start_date: string;
   let generating: boolean = false;
+
   $: start_date,
     (() => {
       if (start_date) {
@@ -57,6 +58,7 @@
         return;
       }
     })();
+
   const generate = async () => {
     // NOTE: yes dates are crazy xD
     const start = to_timestamp(start_date);
@@ -66,10 +68,8 @@
     generating = true;
     try {
       const res: string = await invoke("generate_report", {
-        // NOTE: we will strip the last 3 characters of the timestamp
-        // so it will work with SQLite
-        start: start.toString().substring(0, 10),
-        end: end.toString().substring(0, 10),
+        start,
+        end,
       });
       toast.success(res);
     } catch (err: any) {

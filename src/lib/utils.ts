@@ -22,8 +22,10 @@ const logout = async (): Promise<void> => {
   });
 };
 
-const to_timestamp = (date: string): number => {
-  return new Date(date).getTime();
+const to_timestamp = (date: string): string => {
+  // NOTE: we will strip the last 3 characters of the timestamp
+  // so it will work with SQLite
+  return new Date(date).getTime().toString().substring(0, 10);
 };
 
 export { _goto as goto, logout, to_timestamp }
