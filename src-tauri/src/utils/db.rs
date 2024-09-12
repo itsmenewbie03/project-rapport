@@ -316,10 +316,7 @@ pub fn save_hybrid_feedback_sync(data: &str, feedback_category: &str) -> bool {
 }
 
 pub async fn get_feedbacks(feedback_type: FeedbackType) -> Option<Vec<FeedbackDataRow>> {
-    let table = match feedback_type {
-        FeedbackType::Trad => "trad_feedback_data",
-        FeedbackType::Hybrid => "hybrid_feedback_data",
-    };
+    let table = feedback_type.to_string();
     let db = get_db_connection().await.unwrap();
     let query = format!("SELECT * FROM {}", table);
     let feedbacks = sqlx::query_as::<_, FeedbackDataRow>(&query)

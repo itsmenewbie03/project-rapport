@@ -46,6 +46,12 @@ pub struct HybridFeedbackData {
     pub metadata: HashMap<String, String>,
 }
 
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct TradFeedbackData {
+    pub feedback_data: FeedbackData,
+    pub metadata: HashMap<String, String>,
+}
+
 impl FeedbackData {
     pub fn parse(data: &str) -> Result<Self, String> {
         match serde_json::from_str(data) {
