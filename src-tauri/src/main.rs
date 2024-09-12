@@ -8,6 +8,7 @@ use utils::auth::is_credentials_valid;
 use utils::auth::models::UserData;
 use utils::db;
 use utils::db::archive_feedbacks;
+use utils::feedback::TradFeedbackData;
 use utils::jwt;
 use utils::jwt::Claims;
 use utils::models::DateRangeFilter;
@@ -127,9 +128,17 @@ async fn submit_feedback(
                 } else {
                     "neutral"
                 };
-                feedback_data
-                    .save_to_db(FeedbackType::Trad, feedback_category)
-                    .await;
+
+                let metadata: HashMap<String, String> = serde_json::from_str(metadata).unwrap();
+                let trad_feedback_data = TradFeedbackData {
+                    feedback_data,
+                    metadata,
+                };
+                db::save_trad_feedback(
+                    &serde_json::to_string(&trad_feedback_data).unwrap(),
+                    feedback_category,
+                )
+                .await;
                 return Ok("Feedback submitted successfully".to_owned());
             };
             // INFO: we will only need to stop recording
@@ -257,11 +266,12 @@ async fn change_password(email: &str, current: &str, new: &str) -> Result<String
 }
 
 #[tauri::command]
-async fn get_feedbacks(class: &str) -> Result<String, String> {
+async fn get_feedbacks(class: &str, start: &str, end: &str) -> Result<String, String> {
+    let filter = DateRangeFilter { start, end };
     let feedback_type = FeedbackType::parse(class);
     match feedback_type {
         Ok(feedback_type) => {
-            let feedbacks = db::get_feedbacks(feedback_type).await;
+            let feedbacks = db::get_filtered_feedbacks(feedback_type, filter).await;
             match feedbacks {
                 Some(feedbacks) => Ok(serde_json::to_string(&feedbacks).unwrap()),
                 None => Err("No feedbacks found!".to_owned()),
