@@ -1,6 +1,6 @@
 {
   "name": "project-rapport",
-  "version": "0.0.7",
+  "version": "0.0.7-1",
   "private": true,
   "scripts": {
     "dev": "vite dev",
