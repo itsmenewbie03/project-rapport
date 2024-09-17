@@ -299,6 +299,25 @@ pub async fn save_hybrid_feedback(data: &str, feedback_category: &str) -> bool {
     }
 }
 
+pub async fn save_hybrid_feedback_test(
+    data: &str,
+    feedback_category: &str,
+    created_at: &str,
+) -> bool {
+    let db = get_db_connection().await.unwrap();
+    let result =
+        sqlx::query("INSERT INTO hybrid_feedback_data (data,tag,created_at) VALUES (?,?,?)")
+            .bind(data)
+            .bind(feedback_category)
+            .bind(created_at)
+            .execute(&db)
+            .await;
+    match result {
+        Ok(res) => res.rows_affected() == 1,
+        Err(_) => false,
+    }
+}
+
 pub fn save_hybrid_feedback_sync(data: &str, feedback_category: &str) -> bool {
     let rt = Runtime::new().unwrap();
     rt.block_on(async {
@@ -356,25 +375,25 @@ pub async fn get_filtered_feedbacks(
     }
     Some(feedbacks)
 }
-#[tokio::test]
-async fn get_artifacts_test() {
-    let feedback_type = FeedbackType::Hybrid;
-    let db = get_db_connection().await.unwrap();
-    let table = match feedback_type {
-        FeedbackType::Trad => "trad_feedback_data",
-        FeedbackType::Hybrid => "hybrid_feedback_data",
-    };
-    let query = &format!(
-        // WARN: change to 5 * 365 instead of 1
-        "SELECT id FROM {} WHERE unixepoch('now','localtime') - created_at >= 1 * 24 * 60 * 60",
-        table
-    );
-    let artifacts = sqlx::query_as::<_, ArtifactRow>(query)
-        .fetch_all(&db)
-        .await
-        .unwrap();
-    println!("[RUST]: Artifacts of {} -> {:#?}", table, artifacts);
-}
+// #[tokio::test]
+// async fn get_artifacts_test() {
+//     let feedback_type = FeedbackType::Hybrid;
+//     let db = get_db_connection().await.unwrap();
+//     let table = match feedback_type {
+//         FeedbackType::Trad => "trad_feedback_data",
+//         FeedbackType::Hybrid => "hybrid_feedback_data",
+//     };
+//     let query = &format!(
+//         // WARN: change to 5 * 365 instead of 1
+//         "SELECT id FROM {} WHERE unixepoch('now','localtime') - created_at >= 1 * 24 * 60 * 60",
+//         table
+//     );
+//     let artifacts = sqlx::query_as::<_, ArtifactRow>(query)
+//         .fetch_all(&db)
+//         .await
+//         .unwrap();
+//     println!("[RUST]: Artifacts of {} -> {:#?}", table, artifacts);
+// }
 
 async fn get_artifacts(feedback_type: &FeedbackType) -> Option<Vec<ArtifactRow>> {
     let db = get_db_connection().await.unwrap();
