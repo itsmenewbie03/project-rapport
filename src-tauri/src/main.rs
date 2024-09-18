@@ -8,6 +8,7 @@ use utils::auth::is_credentials_valid;
 use utils::auth::models::UserData;
 use utils::db;
 use utils::db::archive_feedbacks;
+use utils::db::get_filtered_feedbacks;
 use utils::feedback::TradFeedbackData;
 use utils::jwt;
 use utils::jwt::Claims;
@@ -266,17 +267,30 @@ async fn change_password(email: &str, current: &str, new: &str) -> Result<String
 }
 
 #[tauri::command]
-async fn get_feedbacks(class: &str, start: &str, end: &str) -> Result<String, String> {
-    let filter = DateRangeFilter { start, end };
+async fn get_feedbacks(
+    class: &str,
+    start: Option<&str>,
+    end: Option<&str>,
+) -> Result<String, String> {
     let feedback_type = FeedbackType::parse(class);
     match feedback_type {
-        Ok(feedback_type) => {
-            let feedbacks = db::get_filtered_feedbacks(feedback_type, filter).await;
-            match feedbacks {
-                Some(feedbacks) => Ok(serde_json::to_string(&feedbacks).unwrap()),
-                None => Err("No feedbacks found!".to_owned()),
+        Ok(feedback_type) => match (end, start) {
+            (Some(end), Some(start)) => {
+                let filter = DateRangeFilter { start, end };
+                let feedbacks = db::get_filtered_feedbacks(feedback_type, filter).await;
+                match feedbacks {
+                    Some(feedbacks) => Ok(serde_json::to_string(&feedbacks).unwrap()),
+                    None => Err("No feedbacks found!".to_owned()),
+                }
             }
-        }
+            _ => {
+                let feedbacks = db::get_feedbacks(feedback_type).await;
+                match feedbacks {
+                    Some(feedbacks) => Ok(serde_json::to_string(&feedbacks).unwrap()),
+                    None => Err("No feedbacks found!".to_owned()),
+                }
+            }
+        },
         Err(e) => Err(e),
     }
 }
