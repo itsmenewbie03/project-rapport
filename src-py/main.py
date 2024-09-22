@@ -1,15 +1,12 @@
-import importlib
-
 from flask import Flask, request
+from utils import faau, recorder
 
-# NOTE: what the fuck is this abomination?
-recorder = importlib.import_module("recorder", "src-py")
-faau = importlib.import_module("faau", "src-py")
-faau.preload_model()
 app = Flask(__name__)
 
 
-@app.route("/start_recording", methods=["POST"])
+app.route("/start_recording", methods=["POST"])
+
+
 def start_recording():
     data = request.form
     fname = data.get("feedback_id")
@@ -44,10 +41,11 @@ def take_photo():
     print(f"[PYTHON]: Take Photo for {feedback_id} for {quality}")
     if not feedback_id:
         return "Missing Required Params", 400
-    frame_data = faau.take_photo(feedback_id, quality)
-    if not frame_data:
+    photo = faau.take_photo(feedback_id, quality)
+    print(f"[PYTHON]: PHOTO TAKEN: {photo}")
+    if isinstance(photo, bool) and not photo:
         return "Failed to take photo", 400
-    return frame_data
+    return photo
 
 
 @app.route("/poll_analysis", methods=["POST"])
