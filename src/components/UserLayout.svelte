@@ -1,10 +1,10 @@
 <script lang="ts">
-  import "../app.css";
-  import NavBar from "$components/NavBar.svelte";
-  import { Toaster } from "svelte-french-toast";
-  import BreadCrumbs from "./BreadCrumbs.svelte";
-  import { page } from "$app/stores";
-  const is_feedback_page = $page.url.pathname.includes("feedback");
+  import '../app.css';
+  import NavBar from '$components/NavBar.svelte';
+  import { Toaster } from 'svelte-french-toast';
+  import BreadCrumbs from './BreadCrumbs.svelte';
+  import { page } from '$app/stores';
+  const is_feedback_page = $page.url.pathname.includes('feedback');
 </script>
 
 <Toaster />

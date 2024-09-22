@@ -1,10 +1,10 @@
 <script lang="ts">
-  import GuestLayout from "$components/GuestLayout.svelte";
-  import { page } from "$app/stores";
-  import { onMount } from "svelte";
-  import { invoke } from "@tauri-apps/api/tauri";
-  import { goto } from "$lib/utils";
-  import toast from "svelte-french-toast";
+  import GuestLayout from '$components/GuestLayout.svelte';
+  import { page } from '$app/stores';
+  import { onMount } from 'svelte';
+  import { invoke } from '@tauri-apps/api/tauri';
+  import { goto } from '$lib/utils';
+  import toast from 'svelte-french-toast';
 
   let email: string;
   let password: string;
@@ -14,32 +14,32 @@
     event.preventDefault();
     console.log(email, password);
     // NOTE: you leave me no choice, will this the stupid way xD
-    const actual_auth_res: string | null = await invoke("authenticate", {
+    const actual_auth_res: string | null = await invoke('authenticate', {
       email,
       password,
     });
     // INFO: when authentication fails, the response will be null
     if (!actual_auth_res) {
-      toast.error("The credentials provided are not valid. Please try again");
+      toast.error('The credentials provided are not valid. Please try again');
       return;
     }
-    console.log("[RS_AUTH]:", actual_auth_res);
-    localStorage.setItem("auth_token", actual_auth_res);
-    await toast.promise(goto("/dashboard"), {
-      loading: "Logged in. Redirecting...",
-      success: "Welcome to Project Rapport",
-      error: "Failed to redirect, please reload the page.",
+    console.log('[RS_AUTH]:', actual_auth_res);
+    localStorage.setItem('auth_token', actual_auth_res);
+    await toast.promise(goto('/dashboard'), {
+      loading: 'Logged in. Redirecting...',
+      success: 'Welcome to Project Rapport',
+      error: 'Failed to redirect, please reload the page.',
     });
   };
 
   onMount(async () => {
     if ($page.data.session) {
       // TODO: redirect user properly
-      await toast.promise(goto("/dashboard"), {
+      await toast.promise(goto('/dashboard'), {
         loading:
-          "You are already signed in, redirecting you to the dashboard...",
-        success: "Welcome to Project Rapport",
-        error: "Failed to redirect, please reload the page.",
+          'You are already signed in, redirecting you to the dashboard...',
+        success: 'Welcome to Project Rapport',
+        error: 'Failed to redirect, please reload the page.',
       });
     }
     loaded = true;

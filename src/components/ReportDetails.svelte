@@ -1,30 +1,30 @@
 <script lang="ts">
-  import { beforeUpdate, onMount } from "svelte";
+  import { beforeUpdate, onMount } from 'svelte';
 
   let handle: HTMLDialogElement;
   const pretty_key = (key: string) => {
-    let dont_capitalize = ["for", "and"];
+    let dont_capitalize = ['for', 'and'];
     return key
-      .replaceAll("_", " ")
-      .split(" ")
+      .replaceAll('_', ' ')
+      .split(' ')
       .map((word) => {
         if (dont_capitalize.includes(word)) return word;
         return word.charAt(0).toUpperCase() + word.slice(1);
       })
-      .join(" ");
+      .join(' ');
   };
   export const hide = () => {
-    handle.classList.remove("modal-open");
+    handle.classList.remove('modal-open');
   };
 
   export const show = () => {
-    handle.classList.add("modal-open");
+    handle.classList.add('modal-open');
   };
   export let message: string;
   let data: any = {};
   beforeUpdate(() => {
     data = JSON.parse(message);
-    console.log("PARSED", data);
+    console.log('PARSED', data);
   });
 </script>
 

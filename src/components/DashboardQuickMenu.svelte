@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Icon from "./Icon.svelte";
+  import Icon from './Icon.svelte';
 </script>
 
 <ul class="menu bg-base-200 w-56 rounded-box">

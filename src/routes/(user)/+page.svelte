@@ -1,17 +1,17 @@
 <script lang="ts">
-  import GuestLayout from "$components/GuestLayout.svelte";
-  import { page } from "$app/stores";
-  import { goto } from "$app/navigation";
-  import { onMount } from "svelte";
-  import toast from "svelte-french-toast";
+  import GuestLayout from '$components/GuestLayout.svelte';
+  import { page } from '$app/stores';
+  import { goto } from '$app/navigation';
+  import { onMount } from 'svelte';
+  import toast from 'svelte-french-toast';
   let loaded: boolean = false;
   onMount(async () => {
     if ($page.data.session) {
       toast.success(`Welcome Back, ${$page.data.session?.name}`);
-      return await goto("/dashboard");
+      return await goto('/dashboard');
     }
-    toast.error("Please login first.");
-    await goto("/login");
+    toast.error('Please login first.');
+    await goto('/login');
     loaded = true;
   });
 </script>

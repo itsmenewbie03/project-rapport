@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { get_icon } from "$lib/icons";
+  import { get_icon } from '$lib/icons';
   export let name;
   export let _class: string | undefined = undefined;
   export let viewBox: string | undefined = undefined;

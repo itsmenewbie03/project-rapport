@@ -1,15 +1,15 @@
 <script lang="ts">
-  import UserLayout from "$components/UserLayout.svelte";
-  import LoadingBars from "$components/LoadingBars.svelte";
+  import UserLayout from '$components/UserLayout.svelte';
+  import LoadingBars from '$components/LoadingBars.svelte';
 
-  import { DataHandler, Datatable, Th, ThFilter } from "@vincjo/datatables";
-  import { page } from "$app/stores";
-  import { onMount } from "svelte";
-  import { goto } from "$app/navigation";
-  import { history_parser } from "$lib/parser";
-  import { invoke } from "@tauri-apps/api/tauri";
-  import toast from "svelte-french-toast";
-  import ReportDetails from "$components/ReportDetails.svelte";
+  import { DataHandler, Datatable, Th, ThFilter } from '@vincjo/datatables';
+  import { page } from '$app/stores';
+  import { onMount } from 'svelte';
+  import { goto } from '$app/navigation';
+  import { history_parser } from '$lib/parser';
+  import { invoke } from '@tauri-apps/api/tauri';
+  import toast from 'svelte-french-toast';
+  import ReportDetails from '$components/ReportDetails.svelte';
   let empty_any_arr: any[] = [];
   let handler = new DataHandler(empty_any_arr, { rowsPerPage: 10 });
   let rows = handler.getRows();
@@ -17,7 +17,7 @@
 
   // INFO: modal stuff
   let modal_handle: any;
-  let message: string = "{}";
+  let message: string = '{}';
 
   const view_details = (id: string) => {
     // INFO: shut up ts, we know what we are doing xD
@@ -29,11 +29,11 @@
 
   onMount(async () => {
     if (!$page.data.session) {
-      toast.error("Please login first.");
-      await goto("/login");
+      toast.error('Please login first.');
+      await goto('/login');
     }
-    const hybrid_feedback_data: any = await invoke("get_feedbacks", {
-      class: "hybrid",
+    const hybrid_feedback_data: any = await invoke('get_feedbacks', {
+      class: 'hybrid',
     });
     const parsed_data = history_parser(hybrid_feedback_data);
     console.log(parsed_data);

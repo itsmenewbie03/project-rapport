@@ -1,46 +1,46 @@
 <script lang="ts">
-  import toast from "svelte-french-toast";
-  import Icon from "./Icon.svelte";
-  import { goto } from "$lib/utils";
-  import { invoke } from "@tauri-apps/api/tauri";
-  import { page } from "$app/stores";
+  import toast from 'svelte-french-toast';
+  import Icon from './Icon.svelte';
+  import { goto } from '$lib/utils';
+  import { invoke } from '@tauri-apps/api/tauri';
+  import { page } from '$app/stores';
 
   let handle: HTMLDialogElement;
 
   const hide = () => {
-    handle.classList.remove("modal-open");
+    handle.classList.remove('modal-open');
   };
 
   export const show = () => {
-    handle.classList.add("modal-open");
+    handle.classList.add('modal-open');
   };
 
-  let password: string = "";
+  let password: string = '';
 
   const _confirm = async (event: Event) => {
     // TEST: we will implement the actual password verification tomorrow
     event.preventDefault();
-    const is_verified = await invoke("authenticate", {
+    const is_verified = await invoke('authenticate', {
       email: $page.data.session.email,
       password: password,
     });
     if (is_verified) {
-      localStorage.setItem("allowed_to_exit", "true");
+      localStorage.setItem('allowed_to_exit', 'true');
       hide();
-      await toast.promise(goto("/dashboard"), {
-        loading: "Access granted!.",
-        success: "Welcome Back!",
-        error: "Failed to redirect, please reload the page.",
+      await toast.promise(goto('/dashboard'), {
+        loading: 'Access granted!.',
+        success: 'Welcome Back!',
+        error: 'Failed to redirect, please reload the page.',
       });
       // NOTE: we will force stop recording on exit
-      await invoke("clear_recording", {
+      await invoke('clear_recording', {
         id: "I DON'T HAVE ENOUGH TIME TO IMPLEMENT THIS PROPERLY xD!",
       });
-      localStorage.removeItem("allowed_to_exit");
+      localStorage.removeItem('allowed_to_exit');
     } else {
       hide();
-      toast.error("Incorrect password. Please try again.");
-      password = "";
+      toast.error('Incorrect password. Please try again.');
+      password = '';
     }
   };
 </script>

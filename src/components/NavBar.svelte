@@ -1,11 +1,11 @@
 <script lang="ts">
-  import toast from "svelte-french-toast";
-  import { logout } from "$lib/utils";
-  import { goto } from "$app/navigation";
-  import { page } from "$app/stores";
-  import ConfirmModal from "./ConfirmModal.svelte";
+  import toast from 'svelte-french-toast';
+  import { logout } from '$lib/utils';
+  import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
+  import ConfirmModal from './ConfirmModal.svelte';
 
-  const is_feedback_page = $page.url.pathname.includes("feedback");
+  const is_feedback_page = $page.url.pathname.includes('feedback');
   let secret_hits: number = 0;
   let timeout: Timer;
   let modal_handle: any;
@@ -25,16 +25,16 @@
   };
 
   const warn = (event: Event) => {
-    toast.error("This feature is not available during feedback process.");
+    toast.error('This feature is not available during feedback process.');
   };
 
   const _logout = async (event: Event) => {
     await toast.promise(logout(), {
-      loading: "Signing you out...",
+      loading: 'Signing you out...',
       success: "You've been logged out successfully.",
-      error: "We encountered an issue logging you out. Please try again.",
+      error: 'We encountered an issue logging you out. Please try again.',
     });
-    await goto("/login");
+    await goto('/login');
   };
 </script>
 

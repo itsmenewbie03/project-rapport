@@ -2,11 +2,11 @@
   let handle: HTMLDialogElement;
 
   export const hide = () => {
-    handle.classList.remove("modal-open");
+    handle.classList.remove('modal-open');
   };
 
   export const show = () => {
-    handle.classList.add("modal-open");
+    handle.classList.add('modal-open');
   };
 
   export let message: string;

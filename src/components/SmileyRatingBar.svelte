@@ -1,5 +1,5 @@
 <script lang="ts">
-  import SmileyRating from "./SmileyRating.svelte";
+  import SmileyRating from './SmileyRating.svelte';
   export let group: number;
 </script>
 

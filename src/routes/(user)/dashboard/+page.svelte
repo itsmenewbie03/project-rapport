@@ -1,15 +1,15 @@
 <script lang="ts">
-  import UserLayout from "$components/UserLayout.svelte";
-  import DashboardQuickMenu from "$components/DashboardQuickMenu.svelte";
-  import LoadingBars from "$components/LoadingBars.svelte";
-  import { page } from "$app/stores";
-  import { onMount } from "svelte";
-  import { goto } from "$app/navigation";
-  import toast from "svelte-french-toast";
-  import Stats from "$components/Stats.svelte";
-  import ReportGenerator from "$components/ReportGenerator.svelte";
-  import ExtraUtils from "$components/ExtraUtils.svelte";
-  import { invoke } from "@tauri-apps/api/tauri";
+  import UserLayout from '$components/UserLayout.svelte';
+  import DashboardQuickMenu from '$components/DashboardQuickMenu.svelte';
+  import LoadingBars from '$components/LoadingBars.svelte';
+  import { page } from '$app/stores';
+  import { onMount } from 'svelte';
+  import { goto } from '$app/navigation';
+  import toast from 'svelte-french-toast';
+  import Stats from '$components/Stats.svelte';
+  import ReportGenerator from '$components/ReportGenerator.svelte';
+  import ExtraUtils from '$components/ExtraUtils.svelte';
+  import { invoke } from '@tauri-apps/api/tauri';
   let loaded: boolean = false;
   let archiving: boolean = false;
   let handle: HTMLButtonElement;
@@ -17,7 +17,7 @@
   const start_archiving = async () => {
     archiving = true;
     try {
-      const resp: string = await invoke("start_archive");
+      const resp: string = await invoke('start_archive');
       toast.success(resp);
     } catch (err: any) {
       toast.error(err);
@@ -29,8 +29,8 @@
 
   onMount(async () => {
     if (!$page.data.session) {
-      toast.error("Please login first.");
-      await goto("/login");
+      toast.error('Please login first.');
+      await goto('/login');
     }
     // TEST: for aesthetics we will delay the load for a second xD
     setTimeout(() => {

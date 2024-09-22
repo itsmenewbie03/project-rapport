@@ -1,11 +1,11 @@
 <script lang="ts">
-  import UserLayout from "$components/UserLayout.svelte";
-  import LoadingBars from "$components/LoadingBars.svelte";
-  import { page } from "$app/stores";
-  import { onMount } from "svelte";
-  import { beforeNavigate, goto } from "$app/navigation";
-  import toast from "svelte-french-toast";
-  import { invoke } from "@tauri-apps/api/tauri";
+  import UserLayout from '$components/UserLayout.svelte';
+  import LoadingBars from '$components/LoadingBars.svelte';
+  import { page } from '$app/stores';
+  import { onMount } from 'svelte';
+  import { beforeNavigate, goto } from '$app/navigation';
+  import toast from 'svelte-french-toast';
+  import { invoke } from '@tauri-apps/api/tauri';
   let loaded: boolean = false;
   let checked: boolean = false;
   let allow_face_recording: boolean = false;
@@ -20,31 +20,31 @@
 
   const on_continue = () => {
     // NOTE: not sure if this is a good idea xD
-    localStorage.setItem("consent_given", checked.toString());
+    localStorage.setItem('consent_given', checked.toString());
     localStorage.setItem(
-      "allowed_face_recording",
+      'allowed_face_recording',
       allow_face_recording.toString(),
     );
-    goto("/feedback/form");
+    goto('/feedback/form');
   };
 
   onMount(async () => {
     if (!$page.data.session) {
-      toast.error("Please login first.");
-      await goto("/login");
+      toast.error('Please login first.');
+      await goto('/login');
     }
     // TODO: check if consent screen is enabled
 
     const configs: { name: string; value: string }[] =
-      await invoke("get_configs");
+      await invoke('get_configs');
     const consent_screen_enabled =
-      configs.find((e) => e.name === "enable_consent_screen")?.value == "true";
+      configs.find((e) => e.name === 'enable_consent_screen')?.value == 'true';
     if (!consent_screen_enabled) {
       // INFO: redirect to feedback form if consent screen is disabled
       // also start face recording
-      localStorage.setItem("consent_given", "true");
-      localStorage.setItem("allowed_face_recording", "true");
-      return await goto("/feedback/form");
+      localStorage.setItem('consent_given', 'true');
+      localStorage.setItem('allowed_face_recording', 'true');
+      return await goto('/feedback/form');
     }
     // TEST: for aesthetics we will delay the load for a second xD
     setTimeout(() => {
@@ -56,9 +56,9 @@
     // WARN: this might cause in page navigation to fail
     // keep an eye on this
     const is_allowed_to_exit =
-      localStorage.getItem("allowed_to_exit") === "true";
-    if (nav.to?.route.id === "/(user)/dashboard" && !is_allowed_to_exit) {
-      toast.error("You are not allowed to navigate back to dashboard.");
+      localStorage.getItem('allowed_to_exit') === 'true';
+    if (nav.to?.route.id === '/(user)/dashboard' && !is_allowed_to_exit) {
+      toast.error('You are not allowed to navigate back to dashboard.');
       nav.cancel();
     }
   });

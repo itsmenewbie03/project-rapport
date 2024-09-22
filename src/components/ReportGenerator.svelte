@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { invoke } from "@tauri-apps/api/tauri";
-  import { onMount } from "svelte";
-  import toast from "svelte-french-toast";
-  import { startOfMonth, endOfMonth, format } from "date-fns";
-  import { startOfWeek } from "date-fns";
-  import { endOfWeek } from "date-fns";
-  import { compareAsc } from "date-fns";
-  import { addDays } from "date-fns";
-  import { to_timestamp } from "$root/lib/utils";
+  import { invoke } from '@tauri-apps/api/tauri';
+  import { onMount } from 'svelte';
+  import toast from 'svelte-french-toast';
+  import { startOfMonth, endOfMonth, format } from 'date-fns';
+  import { startOfWeek } from 'date-fns';
+  import { endOfWeek } from 'date-fns';
+  import { compareAsc } from 'date-fns';
+  import { addDays } from 'date-fns';
+  import { to_timestamp } from '$root/lib/utils';
   let end_date_input: HTMLInputElement;
   let start_date: string;
   let generating: boolean = false;
@@ -25,8 +25,8 @@
       if (end_date) {
         const cmp = compareAsc(start_date, end_date);
         if (cmp > 0) {
-          toast.error("End Date cannot be before the Start Date");
-          end_date = format(addDays(start_date, 1), "yyyy-MM-dd");
+          toast.error('End Date cannot be before the Start Date');
+          end_date = format(addDays(start_date, 1), 'yyyy-MM-dd');
         }
       }
     })();
@@ -36,25 +36,25 @@
   $: range,
     (() => {
       const today = new Date();
-      if (range === "monthly") {
+      if (range === 'monthly') {
         // Set start_date to the first day of the current month
-        start_date = format(startOfMonth(today), "yyyy-MM-dd");
+        start_date = format(startOfMonth(today), 'yyyy-MM-dd');
         // Set end_date to the last day of the current month
-        end_date = format(endOfMonth(today), "yyyy-MM-dd");
+        end_date = format(endOfMonth(today), 'yyyy-MM-dd');
         return;
       }
-      if (range === "yearly") {
+      if (range === 'yearly') {
         // Set start_date to the first day of the current year
-        start_date = format(today, "yyyy-01-01");
+        start_date = format(today, 'yyyy-01-01');
         // Set end_date to the last day of the current year
-        end_date = format(today, "yyyy-12-31");
+        end_date = format(today, 'yyyy-12-31');
         return;
       }
-      if (range === "weekly") {
+      if (range === 'weekly') {
         // Set start_date to the first day of the current week
-        start_date = format(startOfWeek(today), "yyyy-MM-dd");
+        start_date = format(startOfWeek(today), 'yyyy-MM-dd');
         // Set end_date to the last day of the current week
-        end_date = format(endOfWeek(today), "yyyy-MM-dd");
+        end_date = format(endOfWeek(today), 'yyyy-MM-dd');
         return;
       }
     })();
@@ -64,10 +64,10 @@
     const start = to_timestamp(start_date);
     // NOTE: we will set that the end date ends at 23:59:59
     const end =
-      to_timestamp(format(addDays(end_date, 1), "yyyy-MM-dd HH:mm:ss")) - 1;
+      to_timestamp(format(addDays(end_date, 1), 'yyyy-MM-dd HH:mm:ss')) - 1;
     generating = true;
     try {
-      const res: string = await invoke("generate_report", {
+      const res: string = await invoke('generate_report', {
         start,
         end,
       });
@@ -105,7 +105,7 @@
         <input
           type="date"
           class="input input-bordered w-full"
-          readonly={range !== "custom"}
+          readonly={range !== 'custom'}
           bind:value={start_date}
         />
       </label>
@@ -116,7 +116,7 @@
         <input
           type="date"
           class="input input-bordered w-full"
-          readonly={range !== "custom"}
+          readonly={range !== 'custom'}
           bind:value={end_date}
           bind:this={end_date_input}
         />

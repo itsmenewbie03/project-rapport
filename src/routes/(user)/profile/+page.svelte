@@ -1,31 +1,31 @@
 <script lang="ts">
-  import UserLayout from "$components/UserLayout.svelte";
-  import LoadingBars from "$components/LoadingBars.svelte";
-  import { page } from "$app/stores";
-  import { onMount } from "svelte";
-  import { goto } from "$app/navigation";
-  import toast from "svelte-french-toast";
-  import { invoke } from "@tauri-apps/api/tauri";
-  import { validate_email as is_valid_email } from "$lib/email_validator";
+  import UserLayout from '$components/UserLayout.svelte';
+  import LoadingBars from '$components/LoadingBars.svelte';
+  import { page } from '$app/stores';
+  import { onMount } from 'svelte';
+  import { goto } from '$app/navigation';
+  import toast from 'svelte-french-toast';
+  import { invoke } from '@tauri-apps/api/tauri';
+  import { validate_email as is_valid_email } from '$lib/email_validator';
   let loaded: boolean = false;
-  let name: string = "";
-  let email: string = "";
+  let name: string = '';
+  let email: string = '';
 
-  let current_password: string = "";
-  let new_password: string = "";
-  let confirm_new_password: string = "";
+  let current_password: string = '';
+  let new_password: string = '';
+  let confirm_new_password: string = '';
 
   const save_profile = async (event: Event) => {
     if (!is_valid_email(email)) {
-      toast.error("Invalid email address.");
+      toast.error('Invalid email address.');
       return;
     }
-    if (name === "" || email === "") {
-      toast.error("Name and email cannot be empty.");
+    if (name === '' || email === '') {
+      toast.error('Name and email cannot be empty.');
       return;
     }
     if (name.length < 3) {
-      toast.error("Name must be at least 3 characters.");
+      toast.error('Name must be at least 3 characters.');
       return;
     }
     const update_data = {
@@ -33,15 +33,15 @@
       name,
     };
     try {
-      const resp: string = await invoke("update_profile", {
+      const resp: string = await invoke('update_profile', {
         email: $page.data.session.email,
         data: update_data,
       });
       toast.success(resp);
       // TODO: require re-login after profile update
-      localStorage.removeItem("auth_token");
+      localStorage.removeItem('auth_token');
       setTimeout(() => {
-        goto("/login");
+        goto('/login');
       }, 2000);
     } catch (err: any) {
       toast.error(err);
@@ -49,31 +49,31 @@
   };
 
   const update_password = async (event: Event) => {
-    const is_verified = await invoke("authenticate", {
+    const is_verified = await invoke('authenticate', {
       email: $page.data.session.email,
       password: current_password,
     });
 
     if (!is_verified) {
-      toast.error("Current password is incorrect.");
+      toast.error('Current password is incorrect.');
       return;
     }
 
     if (new_password !== confirm_new_password) {
-      toast.error("New password and confirm password must match.");
+      toast.error('New password and confirm password must match.');
       return;
     }
     try {
-      const resp: string = await invoke("change_password", {
+      const resp: string = await invoke('change_password', {
         email: $page.data.session.email,
         current: current_password,
         new: new_password,
       });
       toast.success(resp);
       // TODO: require re-login after profile update
-      localStorage.removeItem("auth_token");
+      localStorage.removeItem('auth_token');
       setTimeout(() => {
-        goto("/login");
+        goto('/login');
       }, 2000);
     } catch (err: any) {
       toast.error(err);
@@ -82,8 +82,8 @@
 
   onMount(async () => {
     if (!$page.data.session) {
-      toast.error("Please login first.");
-      await goto("/login");
+      toast.error('Please login first.');
+      await goto('/login');
     }
     name = $page.data.session.name;
     email = $page.data.session.email;

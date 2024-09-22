@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Icon from "./Icon.svelte";
+  import Icon from './Icon.svelte';
 
   export let handle: HTMLButtonElement;
   export let loading: boolean = false;

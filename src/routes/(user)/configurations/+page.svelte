@@ -1,19 +1,19 @@
 <script lang="ts">
-  import UserLayout from "$components/UserLayout.svelte";
-  import LoadingBars from "$components/LoadingBars.svelte";
-  import { page } from "$app/stores";
-  import { onMount } from "svelte";
-  import { goto } from "$app/navigation";
-  import toast from "svelte-french-toast";
-  import { invoke } from "@tauri-apps/api/tauri";
-  import { validate_email as is_valid_email } from "$lib/email_validator";
-  import { ask, confirm } from "@tauri-apps/api/dialog";
+  import UserLayout from '$components/UserLayout.svelte';
+  import LoadingBars from '$components/LoadingBars.svelte';
+  import { page } from '$app/stores';
+  import { onMount } from 'svelte';
+  import { goto } from '$app/navigation';
+  import toast from 'svelte-french-toast';
+  import { invoke } from '@tauri-apps/api/tauri';
+  import { validate_email as is_valid_email } from '$lib/email_validator';
+  import { ask, confirm } from '@tauri-apps/api/dialog';
   let loaded: boolean = false;
 
   let max_negative_feedback: number = 3;
-  let email_recipient: string = "email@example.com";
-  let office_name: string = "NOT CONFIGURED YET";
-  let enable_consent_screen: string = "false";
+  let email_recipient: string = 'email@example.com';
+  let office_name: string = 'NOT CONFIGURED YET';
+  let enable_consent_screen: string = 'false';
   let services_list: string[] = [];
 
   type ConfigData = {
@@ -27,7 +27,7 @@
 
   const save = async (event: Event) => {
     if (!is_valid_email(email_recipient)) {
-      toast.error("Invalid email address.");
+      toast.error('Invalid email address.');
       return;
     }
     const config_data = {
@@ -38,7 +38,7 @@
       enable_consent_screen,
     };
     try {
-      const config_saved: string = await invoke("save_configs", {
+      const config_saved: string = await invoke('save_configs', {
         data: config_data,
       });
       toast.success(config_saved);
@@ -48,63 +48,63 @@
   };
 
   const add_service = async (event: Event) => {
-    let service = prompt("Please enter the service you want to add.");
+    let service = prompt('Please enter the service you want to add.');
     if (!service) {
       return;
     }
     let service_cleaned = service.trim();
     if (!service_cleaned.length) {
-      toast.error("Service must be not be all whitespaces.");
+      toast.error('Service must be not be all whitespaces.');
       return;
     }
     if (service_cleaned.length < 5) {
-      toast.error("Service must be at least 5 characters.");
+      toast.error('Service must be at least 5 characters.');
       return;
     }
     try {
-      const resp: string = await invoke("add_service", {
+      const resp: string = await invoke('add_service', {
         service: service_cleaned,
       });
       services_list.push(service_cleaned);
       services_list = services_list;
       toast.success(resp);
     } catch (err: any) {
-      console.error("ADD_SERVICE", err);
+      console.error('ADD_SERVICE', err);
     }
   };
 
   const load_services = async () => {
     try {
-      const services: ServiceData[] = await invoke("get_services");
+      const services: ServiceData[] = await invoke('get_services');
       services.forEach((service) => {
         services_list.push(service.name);
       });
-      console.log("SERVICES", services_list);
+      console.log('SERVICES', services_list);
     } catch (err: any) {
-      console.error("SERVICES", err);
+      console.error('SERVICES', err);
     }
   };
   // FIX: the code below is an absolute dogshit
   // but we don't have enough time to clean code it xD
   const service_action_prompt = async (service: string) => {
     const should_delete = await ask(
-      "What action do you want to take? If you want none just click edit and click cancel.",
+      'What action do you want to take? If you want none just click edit and click cancel.',
       {
-        title: "Select Action",
-        okLabel: "Delete",
-        cancelLabel: "Edit",
+        title: 'Select Action',
+        okLabel: 'Delete',
+        cancelLabel: 'Edit',
       },
     );
     // INFO: handle delete case
     if (should_delete) {
       const confirmed = await confirm(
-        "This action cannot be undone, please click OK if you want to proceed.",
+        'This action cannot be undone, please click OK if you want to proceed.',
         `Are you sure you want to delete ${service}?`,
       );
       if (confirmed) {
         // TODO: implement delete function
         try {
-          const resp: string = await invoke("delete_service", { service });
+          const resp: string = await invoke('delete_service', { service });
           toast.success(resp);
           // INFO: why tf arr.remove or arr.popAt does not exists?
           services_list.splice(services_list.indexOf(service), 1);
@@ -116,26 +116,26 @@
       return;
     }
     // INFO: handle edit case
-    let edited_service = prompt("Please enter new service name.", service);
+    let edited_service = prompt('Please enter new service name.', service);
     if (!edited_service) {
       return;
     }
     let edited_service_cleaned = edited_service.trim();
     if (!edited_service_cleaned.length) {
-      toast.error("Service must be not be all whitespaces.");
+      toast.error('Service must be not be all whitespaces.');
       return;
     }
     if (edited_service_cleaned.length < 5) {
-      toast.error("Service must be at least 5 characters.");
+      toast.error('Service must be at least 5 characters.');
       return;
     }
     if (edited_service_cleaned === service) {
-      toast.error("No change was made.");
+      toast.error('No change was made.');
       return;
     }
     // INFO: implement edit function
     try {
-      const resp: string = await invoke("edit_service", {
+      const resp: string = await invoke('edit_service', {
         target: service,
         update: edited_service_cleaned,
       });
@@ -148,26 +148,26 @@
 
   onMount(async () => {
     if (!$page.data.session) {
-      toast.error("Please login first.");
-      await goto("/login");
+      toast.error('Please login first.');
+      await goto('/login');
     }
     await load_services();
     try {
-      const configs: ConfigData[] = await invoke("get_configs");
+      const configs: ConfigData[] = await invoke('get_configs');
       configs.forEach((config) => {
-        if (config.name === "max_negative_feedback") {
+        if (config.name === 'max_negative_feedback') {
           max_negative_feedback = parseInt(config.value);
-        } else if (config.name === "email_recipient") {
+        } else if (config.name === 'email_recipient') {
           email_recipient = config.value;
-        } else if (config.name === "office_name") {
+        } else if (config.name === 'office_name') {
           office_name = config.value;
-        } else if (config.name === "enable_consent_screen") {
+        } else if (config.name === 'enable_consent_screen') {
           enable_consent_screen = config.value;
         }
       });
-      console.log("CONFIGS", configs);
+      console.log('CONFIGS', configs);
     } catch (err: any) {
-      console.error("CONFIGS", err);
+      console.error('CONFIGS', err);
     }
 
     // TEST: for aesthetics we will delay the load for a second xD

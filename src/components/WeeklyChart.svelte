@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Line } from "svelte-chartjs";
-  import { Colors } from "chart.js";
+  import { Line } from 'svelte-chartjs';
+  import { Colors } from 'chart.js';
 
   import {
     Chart as ChartJS,
@@ -12,7 +12,7 @@
     PointElement,
     CategoryScale,
     Filler,
-  } from "chart.js";
+  } from 'chart.js';
 
   ChartJS.register(
     Title,
@@ -42,7 +42,7 @@
     plugins: {
       title: {
         display: true,
-        text: "Daily Traditional Feedback Data Chart",
+        text: 'Daily Traditional Feedback Data Chart',
       },
       legend: {
         labels: {
