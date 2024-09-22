@@ -1,27 +1,27 @@
 <script lang="ts">
-  import UserLayout from "$components/UserLayout.svelte";
-  import LoadingBars from "$components/LoadingBars.svelte";
-  import QuickTip from "$components/QuickTip.svelte";
-  import ThankYouModal from "$components/ThankYouModal.svelte";
-  import toast from "svelte-french-toast";
-  import { page } from "$app/stores";
-  import { onMount } from "svelte";
-  import { beforeNavigate, goto } from "$app/navigation";
-  import { invoke } from "@tauri-apps/api/tauri";
-  import { confirm } from "@tauri-apps/api/dialog";
-  import { gen_uuid } from "$lib/uuids";
-  import SmileyRatingBar from "$components/SmileyRatingBar.svelte";
+  import UserLayout from '$components/UserLayout.svelte';
+  import LoadingBars from '$components/LoadingBars.svelte';
+  import QuickTip from '$components/QuickTip.svelte';
+  import ThankYouModal from '$components/ThankYouModal.svelte';
+  import toast from 'svelte-french-toast';
+  import { page } from '$app/stores';
+  import { onMount } from 'svelte';
+  import { beforeNavigate, goto } from '$app/navigation';
+  import { invoke } from '@tauri-apps/api/tauri';
+  import { confirm } from '@tauri-apps/api/dialog';
+  import { gen_uuid } from '$lib/uuids';
+  import SmileyRatingBar from '$components/SmileyRatingBar.svelte';
 
   let loaded: boolean = false;
-  let uuid: string = "";
+  let uuid: string = '';
   let dont_stop: boolean = false;
   let recording: boolean = false;
 
-  let client_type: string = "";
-  let other_client_type: string = "";
-  let contact_number: string = "";
-  let name: string = "";
-  let purpose_of_visit: string = "";
+  let client_type: string = '';
+  let other_client_type: string = '';
+  let contact_number: string = '';
+  let name: string = '';
+  let purpose_of_visit: string = '';
   let initial_step_done = false;
 
   let services_list: string[] = [];
@@ -40,15 +40,15 @@
         purpose_of_visit.length > 0
       );
     });
-    console.log("FILTERD", suggested_services);
+    console.log('FILTERD', suggested_services);
   };
 
   const clear_form = (event: Event) => {
-    name = "";
-    contact_number = "";
-    client_type = "";
-    other_client_type = "";
-    purpose_of_visit = "";
+    name = '';
+    contact_number = '';
+    client_type = '';
+    other_client_type = '';
+    purpose_of_visit = '';
   };
 
   const clear_scores = (event: Event) => {
@@ -65,14 +65,14 @@
 
   // INFO: Thank You Modal Stuff
   let modal_handle: any;
-  let message: string = "";
+  let message: string = '';
 
   // INFO: feedback data
   let responsiveness: number = 0;
   $: responsiveness,
     (async () => {
       if (responsiveness) {
-        await take_photo("responsiveness");
+        await take_photo('responsiveness');
       }
     })();
 
@@ -80,7 +80,7 @@
   $: reliability,
     (async () => {
       if (reliability) {
-        await take_photo("reliability");
+        await take_photo('reliability');
       }
     })();
 
@@ -88,7 +88,7 @@
   $: access_and_facilities,
     (async () => {
       if (access_and_facilities) {
-        await take_photo("access_and_facilities");
+        await take_photo('access_and_facilities');
       }
     })();
 
@@ -96,7 +96,7 @@
   $: communication,
     (async () => {
       if (communication) {
-        await take_photo("communication");
+        await take_photo('communication');
       }
     })();
 
@@ -104,7 +104,7 @@
   $: value_for_money,
     (async () => {
       if (value_for_money) {
-        await take_photo("value_for_money");
+        await take_photo('value_for_money');
       }
     })();
 
@@ -112,7 +112,7 @@
   $: integrity,
     (async () => {
       if (integrity) {
-        await take_photo("integrity");
+        await take_photo('integrity');
       }
     })();
 
@@ -120,7 +120,7 @@
   $: assurance,
     (async () => {
       if (assurance) {
-        await take_photo("assurance");
+        await take_photo('assurance');
       }
     })();
 
@@ -128,7 +128,7 @@
   $: outcome,
     (async () => {
       if (outcome) {
-        await take_photo("outcome");
+        await take_photo('outcome');
       }
     })();
 
@@ -136,19 +136,19 @@
   $: overall_satisfaction,
     (async () => {
       if (overall_satisfaction) {
-        await take_photo("overall_satisfaction");
+        await take_photo('overall_satisfaction');
       }
     })();
 
   const load_services = async () => {
     try {
-      const services: ServiceData[] = await invoke("get_services");
+      const services: ServiceData[] = await invoke('get_services');
       services.forEach((service) => {
         services_list.push(service.name);
       });
-      console.log("SERVICES", services_list);
+      console.log('SERVICES', services_list);
     } catch (err: any) {
-      console.error("SERVICES", err);
+      console.error('SERVICES', err);
     }
   };
 
@@ -170,25 +170,25 @@
     };
 
     // WARN: shitty code ahead
-    let office_name: string = "NOT CONFIGURED";
+    let office_name: string = 'NOT CONFIGURED';
     type ConfigData = {
       name: string;
       value: string;
     };
     try {
-      const configs: ConfigData[] = await invoke("get_configs");
+      const configs: ConfigData[] = await invoke('get_configs');
       configs.forEach((config) => {
-        if (config.name === "office_name") {
+        if (config.name === 'office_name') {
           office_name = config.value;
         }
       });
     } catch (err) {
-      console.log("failed to get office name from configs database!");
+      console.log('failed to get office name from configs database!');
     }
     // WARN: end of shitty code
 
     const metadata = {
-      client_type: client_type === "other" ? other_client_type : client_type,
+      client_type: client_type === 'other' ? other_client_type : client_type,
       purpose_of_visit,
       office_name,
       contact_number,
@@ -204,20 +204,21 @@
       }
     }
     if (non_rated.length > 0) {
-      toast.error(`Please rate the following: ${non_rated.join(", ")}.`);
+      toast.error(`Please rate the following: ${non_rated.join(', ')}.`);
       return;
     }
     // TODO: ensure all emotions are captured
     if (Object.keys(emotion_data).length !== 9 && recording) {
+      console.log(emotion_data);
       toast.error(
-        "Oops, you are going too fast! Please click submit after a few seconds.",
+        'Oops, you are going too fast! Please click submit after a few seconds.',
       );
       return;
     }
     try {
       console.log(emotion_data);
       console.log(data);
-      const response: any = await invoke("submit_feedback", {
+      const response: any = await invoke('submit_feedback', {
         id: uuid,
         feedback: JSON.stringify(data),
         emotion:
@@ -228,12 +229,12 @@
         metadata: JSON.stringify(metadata),
         recording: recording,
       });
-      message = `Your feedback has been submitted successfully. ${recording ? "Recording is also stopped." : ""} You will be redirected back to the consent screen shortly.`;
+      message = `Your feedback has been submitted successfully. ${recording ? 'Recording is also stopped.' : ''} You will be redirected back to the consent screen shortly.`;
       modal_handle.show();
       setTimeout(async () => {
         modal_handle.hide();
         dont_stop = true;
-        await goto("/feedback/consent");
+        await goto('/feedback/consent');
       }, 4000);
     } catch (err: any) {
       toast.error(err);
@@ -244,34 +245,34 @@
     if (
       !client_type ||
       !purpose_of_visit ||
-      (client_type === "other" && !other_client_type)
+      (client_type === 'other' && !other_client_type)
     ) {
-      toast.error("Please fill out all the fields.");
+      toast.error('Please fill out all the fields.');
       return;
     }
     // INFO: when user allowed_face_recording we should tell our backend to start recording
-    if (localStorage.getItem("allowed_face_recording") === "true") {
+    if (localStorage.getItem('allowed_face_recording') === 'true') {
       try {
-        await invoke("start_face_recording", {
+        await invoke('start_face_recording', {
           id: uuid,
         });
-        toast.success("You are now being recorded.");
+        toast.success('You are now being recorded.');
         recording = true;
       } catch (error: any) {
-        toast.error("There was an error starting the recording.");
+        toast.error('There was an error starting the recording.');
         // TODO: implement logging for debugging
       }
     }
     // NOTE: consent is only valid for one feedback session
-    localStorage.removeItem("consent_given");
-    localStorage.removeItem("allowed_face_recording");
+    localStorage.removeItem('consent_given');
+    localStorage.removeItem('allowed_face_recording');
     initial_step_done = true;
   };
 
   const take_photo = async (quality: string) => {
     if (!recording) return;
     try {
-      const frame_data: string = await invoke("take_photo", {
+      const frame_data: string = await invoke('take_photo', {
         id: uuid,
         quality: quality,
       });
@@ -284,7 +285,7 @@
       emotion_data[quality] = frame.dominant_emotion;
     } catch (err) {
       // BUG: for debug we will just toast error the bug
-      toast.error("There was an error taking the photo.");
+      toast.error('There was an error taking the photo.');
     }
   };
 
@@ -293,20 +294,20 @@
     uuid = gen_uuid();
 
     if (!$page.data.session) {
-      toast.error("Please login first.");
-      await goto("/login");
+      toast.error('Please login first.');
+      await goto('/login');
     }
     // TODO: check for flags in localStorage
-    if (localStorage.getItem("consent_given") !== "true") {
-      toast.error("Session expired, please start from the beginning.");
+    if (localStorage.getItem('consent_given') !== 'true') {
+      toast.error('Session expired, please start from the beginning.');
       // HACK: stop the recording just in case the user reloads the feedback page.
       // why do we have to suffer for their mistakes? xD
       if (recording) {
-        await invoke("clear_recording", {
+        await invoke('clear_recording', {
           id: "I DON'T HAVE ENOUGH TIME TO IMPLEMENT THIS PROPERLY xD!",
         });
       }
-      await goto("/feedback/consent");
+      await goto('/feedback/consent');
       return;
     }
     await load_services();
@@ -320,23 +321,23 @@
     // WARN: this might cause in page navigation to fail
     // keep an eye on this
     const is_allowed_to_exit =
-      localStorage.getItem("allowed_to_exit") === "true";
-    if (nav.to?.route.id === "/(user)/dashboard" && !is_allowed_to_exit) {
-      toast.error("You are not allowed to navigate back to dashboard.");
+      localStorage.getItem('allowed_to_exit') === 'true';
+    if (nav.to?.route.id === '/(user)/dashboard' && !is_allowed_to_exit) {
+      toast.error('You are not allowed to navigate back to dashboard.');
       nav.cancel();
       return;
     }
     if (
       recording &&
-      nav.to?.route.id === "/(user)/feedback/consent" &&
+      nav.to?.route.id === '/(user)/feedback/consent' &&
       !dont_stop
     ) {
       // NOTE: for some reason the navigation continues itself so we stop it and manually navigate
       nav.cancel();
-      let toast_id = toast.loading("Confirmation needed, waiting...");
+      let toast_id = toast.loading('Confirmation needed, waiting...');
       let confirmed = await confirm(
-        "Returning to the consent screen will stop the recording and delete the file.",
-        "Are you sure you want to proceed?",
+        'Returning to the consent screen will stop the recording and delete the file.',
+        'Are you sure you want to proceed?',
       );
       console.log(`Confirmed: ${confirmed}`);
       if (!confirmed) {
@@ -344,15 +345,15 @@
         return;
       }
       toast.remove(toast_id);
-      toast.promise(invoke("clear_recording", { id: uuid }), {
-        loading: "Stopping recording and deleting file...",
-        success: "Recording stopped successfully. The file has been deleted.",
+      toast.promise(invoke('clear_recording', { id: uuid }), {
+        loading: 'Stopping recording and deleting file...',
+        success: 'Recording stopped successfully. The file has been deleted.',
         error:
-          "We encountered a problem stopping the recording and deleting the file",
+          'We encountered a problem stopping the recording and deleting the file',
       });
       // INFO: manual redirect
       dont_stop = true;
-      await goto("/feedback/consent");
+      await goto('/feedback/consent');
     }
   });
 </script>
@@ -368,7 +369,11 @@
               class="btn btn-ghost btn-sm underline"
               on:click={async () => {
                 dont_stop = true;
-                await goto("/feedback/consent");
+                // NOTE: stop recording when they go back to consent screen
+                await invoke('clear_recording', {
+                  id: "I DON'T HAVE ENOUGH TIME TO IMPLEMENT THIS PROPERLY xD!",
+                });
+                await goto('/feedback/consent');
               }}
             >
               <svg
@@ -464,7 +469,7 @@
                 <span class="label-text ml-2">Other</span>
               </label>
             </div>
-            {#if client_type == "other"}
+            {#if client_type == 'other'}
               <p class="text-xl font-bold mt-4">Please Specify</p>
               <input
                 type="text"
@@ -511,7 +516,7 @@
                 on:click={initial_submit}
                 disabled={!client_type ||
                   !purpose_of_visit ||
-                  (client_type === "other" && !other_client_type)}>Next</button
+                  (client_type === 'other' && !other_client_type)}>Next</button
               >
             </div>
           {:else}

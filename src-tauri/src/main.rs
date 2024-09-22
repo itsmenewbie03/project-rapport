@@ -8,7 +8,6 @@ use utils::auth::is_credentials_valid;
 use utils::auth::models::UserData;
 use utils::db;
 use utils::db::archive_feedbacks;
-use utils::db::get_filtered_feedbacks;
 use utils::feedback::TradFeedbackData;
 use utils::jwt;
 use utils::jwt::Claims;
