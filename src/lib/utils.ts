@@ -1,4 +1,4 @@
-import { goto } from "$app/navigation";
+import { goto } from '$app/navigation';
 
 /**
  * We intentionally introduce a 1 second delay for aesthetics xD
@@ -16,7 +16,7 @@ const _goto = async (url: string) => {
 const logout = async (): Promise<void> => {
   return new Promise(async (resolve) => {
     setTimeout(async () => {
-      localStorage.removeItem("auth_token");
+      localStorage.removeItem('auth_token');
       resolve();
     }, 1000);
   });
@@ -28,4 +28,4 @@ const to_timestamp = (date: string): string => {
   return new Date(date).getTime().toString().substring(0, 10);
 };
 
-export { _goto as goto, logout, to_timestamp }
+export { _goto as goto, logout, to_timestamp };

@@ -1,10 +1,10 @@
 // NOTE: this will be trash, and I won't refactor it xD
 type Rating =
-  | "very_dissatisfied"
-  | "dissatisfied"
-  | "neutral"
-  | "satisfied"
-  | "very_satisfied";
+  | 'very_dissatisfied'
+  | 'dissatisfied'
+  | 'neutral'
+  | 'satisfied'
+  | 'very_satisfied';
 
 const very_dissatisfied = `
     <svg

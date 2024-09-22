@@ -6,7 +6,7 @@ import crypto from 'crypto';
 const hash = async (password: string) => {
   const salt = await generateSalt(); // Call to generate a secure random salt
   const hashBuffer = await bcryptHash(password, salt);
-  return hashBuffer
+  return hashBuffer;
 };
 
 async function generateSalt(): Promise<string> {
@@ -27,13 +27,22 @@ async function generateSalt(): Promise<string> {
 async function bcryptHash(password: string, salt: string): Promise<string> {
   const cost = 10; // Adjust the cost factor as needed (higher = slower, more secure)
   return new Promise((resolve, reject) => {
-    crypto.pbkdf2(password, salt, cost * 2 ** 16, 512, 'sha512', (err, derivedKey) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(Buffer.concat([Buffer.from(salt), derivedKey]).toString('base64')); // Combine salt and hash
-      }
-    });
+    crypto.pbkdf2(
+      password,
+      salt,
+      cost * 2 ** 16,
+      512,
+      'sha512',
+      (err, derivedKey) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(
+            Buffer.concat([Buffer.from(salt), derivedKey]).toString('base64'),
+          ); // Combine salt and hash
+        }
+      },
+    );
   });
 }
 

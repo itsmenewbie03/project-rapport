@@ -75,8 +75,8 @@ const load_class = (svg: string, cls: string, viewBox: string): string => {
  * */
 const get_icon = (
   page: string,
-  _class: string = "size-6",
-  view_box: string = "0 0 24 24",
+  _class: string = 'size-6',
+  view_box: string = '0 0 24 24',
 ): string => {
   if (!Object.keys(PAGE_ICONS).includes(page)) {
     return load_class(PAGE_ICONS.default, _class, view_box);
