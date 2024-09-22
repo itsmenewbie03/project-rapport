@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use dotenv::dotenv;
+
 pub async fn start(feedback_id: &str) -> Result<String, String> {
     let client = reqwest::Client::new();
     let url = "http://localhost:5000/start_analysis";
@@ -13,7 +15,7 @@ pub async fn start(feedback_id: &str) -> Result<String, String> {
     let request = client.post(url).form(&params);
     let response = request.send().await.unwrap();
     match response.error_for_status_ref() {
-        Ok(_) => Ok(response.text().await.unwrap().to_owned()),
+        Ok(_) => Ok(response.text().await.unwrap()),
         Err(_) => Err(response.text().await.unwrap()),
     }
 }
@@ -27,7 +29,30 @@ pub async fn capture(feedback_id: &str, quality: &str) -> Result<String, String>
     let request = client.post(url).form(&params);
     let response = request.send().await.unwrap();
     match response.error_for_status_ref() {
-        Ok(_) => Ok(response.text().await.unwrap().to_owned()),
+        Ok(_) => {
+            let resp = response.text().await.unwrap();
+            // NOTE: we need to forward this to the analysis api
+            println!("[RUST]: capture response: {}", resp);
+            let analysis_resp = analyze(&resp).await.unwrap();
+            println!("[RUST]: analysis response: {}", analysis_resp);
+            Ok(analysis_resp)
+        }
+        Err(_) => Err(response.text().await.unwrap()),
+    }
+}
+
+async fn analyze(b64img: &str) -> Result<String, String> {
+    dotenv().ok();
+    let client = reqwest::Client::new();
+    let url = "http://localhost:6969/start_analysis";
+    let debug = std::env::var("DEBUG").unwrap_or("false".to_owned());
+    let mut params = HashMap::new();
+    params.insert("b64img", b64img);
+    params.insert("debug", &debug);
+    let request = client.post(url).form(&params);
+    let response = request.send().await.unwrap();
+    match response.error_for_status_ref() {
+        Ok(_) => Ok(response.text().await.unwrap()),
         Err(_) => Err(response.text().await.unwrap()),
     }
 }
@@ -45,7 +70,7 @@ pub fn poll(feedback_id: &str) -> Result<String, String> {
     let request = client.post(url).form(&params);
     let response = request.send().unwrap();
     match response.error_for_status_ref() {
-        Ok(_) => Ok(response.text().unwrap().to_owned()),
+        Ok(_) => Ok(response.text().unwrap()),
         Err(_) => Err(response.text().unwrap()),
     }
 }
