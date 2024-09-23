@@ -2,6 +2,8 @@ use std::collections::HashMap;
 
 use dotenv::dotenv;
 
+use super::notifications::warn;
+
 pub async fn start(feedback_id: &str) -> Result<String, String> {
     let client = reqwest::Client::new();
     let url = "http://localhost:5000/start_analysis";
@@ -45,6 +47,11 @@ async fn analyze(b64img: &str) -> Result<String, String> {
     dotenv().ok();
     let client = reqwest::Client::new();
     let url = "http://localhost:6969/start_analysis";
+    let url = std::env::var("ANALYSIS_API_URL").unwrap_or_else(|_| {
+        // NOTE: we're using the fallback URL, this will fail in most cases
+        warn("ANALYSIS_API_URL not set, using fallback URL\nNote this might not work as expected");
+        url.to_owned()
+    });
     let debug = std::env::var("DEBUG").unwrap_or("false".to_owned());
     let mut params = HashMap::new();
     params.insert("b64img", b64img);
