@@ -42,7 +42,7 @@
     plugins: {
       title: {
         display: true,
-        text: 'Daily Traditional Feedback Data Chart',
+        text: 'Weekly Traditional Feedback Data Chart',
       },
       legend: {
         labels: {
