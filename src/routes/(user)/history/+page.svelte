@@ -19,6 +19,8 @@
   let modal_handle: any;
   let message: string = '{}';
 
+  let no_feedback_data: boolean = false;
+
   const view_details = (id: string) => {
     // INFO: shut up ts, we know what we are doing xD
     // and why do I need $ prefix here???
@@ -34,9 +36,13 @@
     }
     const hybrid_feedback_data: any = await invoke('get_feedbacks', {
       class: 'hybrid',
+    }).catch((e) => {
+      setTimeout(() => {
+        no_feedback_data = true;
+        loaded = true;
+      }, 1000);
     });
     const parsed_data = history_parser(hybrid_feedback_data);
-    console.log(parsed_data);
     handler.setRows(parsed_data);
     // TEST: for aesthetics we will delay the load for a second xD
     setTimeout(() => {
@@ -50,58 +56,68 @@
   <div class="flex flex-col h-[calc(100vh-144px)]">
     {#if loaded}
       {#if $page.data.session}
-        <div class="px-14 py-4">
-          <Datatable {handler} class="pb-14">
-            <table class="table">
-              <thead>
-                <tr>
-                  <Th {handler} orderBy="id">ID</Th>
-                  <Th {handler} orderBy="office_name">Office</Th>
-                  <Th {handler} orderBy="mean_rating">Overall Rating</Th>
-                  <Th {handler} orderBy="mean_rating_percent"
-                    >Overall Rating Percentage</Th
-                  >
-                  <Th {handler} orderBy="overall_emotion">Overall Emotion</Th>
-                  <Th {handler} orderBy="overall_emotion_percent"
-                    >Overall Emotion Percentage</Th
-                  >
-                  <Th {handler} orderBy="tag">Tag</Th>
-                  <th></th>
-                </tr>
-                <tr>
-                  <ThFilter {handler} filterBy="id" />
-                  <ThFilter {handler} filterBy="office_name" />
-                  <ThFilter {handler} filterBy="mean_rating" />
-                  <ThFilter {handler} filterBy="mean_rating_percent" />
-                  <ThFilter {handler} filterBy="overall_emotion" />
-                  <ThFilter {handler} filterBy="overall_emotion_percent" />
-                  <ThFilter {handler} filterBy="tag" />
-                </tr>
-              </thead>
-              <tbody>
-                {#each $rows as row}
+        {#if !no_feedback_data}
+          <div class="px-14 py-4">
+            <Datatable {handler} class="pb-14">
+              <table class="table">
+                <thead>
                   <tr>
-                    <td>{row.id}</td>
-                    <td>{row.office_name}</td>
-                    <td>{row.mean_rating}</td>
-                    <td>{row.mean_rating_percent}%</td>
-                    <td>{row.overall_emotion}</td>
-                    <td>{row.overall_emotion_percent}%</td>
-                    <td>{row.tag}</td>
-                    <td>
-                      <button
-                        class="btn btn-primary btn-xs"
-                        on:click={() => {
-                          view_details(row.id);
-                        }}>View</button
-                      >
-                    </td>
+                    <Th {handler} orderBy="id">ID</Th>
+                    <Th {handler} orderBy="office_name">Office</Th>
+                    <Th {handler} orderBy="mean_rating">Overall Rating</Th>
+                    <Th {handler} orderBy="mean_rating_percent"
+                      >Overall Rating Percentage</Th
+                    >
+                    <Th {handler} orderBy="overall_emotion">Overall Emotion</Th>
+                    <Th {handler} orderBy="overall_emotion_percent"
+                      >Overall Emotion Percentage</Th
+                    >
+                    <Th {handler} orderBy="tag">Tag</Th>
+                    <th></th>
                   </tr>
-                {/each}
-              </tbody>
-            </table>
-          </Datatable>
-        </div>
+                  <tr>
+                    <ThFilter {handler} filterBy="id" />
+                    <ThFilter {handler} filterBy="office_name" />
+                    <ThFilter {handler} filterBy="mean_rating" />
+                    <ThFilter {handler} filterBy="mean_rating_percent" />
+                    <ThFilter {handler} filterBy="overall_emotion" />
+                    <ThFilter {handler} filterBy="overall_emotion_percent" />
+                    <ThFilter {handler} filterBy="tag" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {#each $rows as row}
+                    <tr>
+                      <td>{row.id}</td>
+                      <td>{row.office_name}</td>
+                      <td>{row.mean_rating}</td>
+                      <td>{row.mean_rating_percent}%</td>
+                      <td>{row.overall_emotion}</td>
+                      <td>{row.overall_emotion_percent}%</td>
+                      <td>{row.tag}</td>
+                      <td>
+                        <button
+                          class="btn btn-primary btn-xs"
+                          on:click={() => {
+                            view_details(row.id);
+                          }}>View</button
+                        >
+                      </td>
+                    </tr>
+                  {/each}
+                </tbody>
+              </table>
+            </Datatable>
+          </div>
+        {:else}
+          <div
+            class="px-14 py-4 flex flex-col items-center justify-center h-full"
+          >
+            <h1 class="font-bold text-2xl">
+              No data to show. Ensure the database is not empty.
+            </h1>
+          </div>
+        {/if}
       {:else}
         <h1>Access Denied</h1>
       {/if}
