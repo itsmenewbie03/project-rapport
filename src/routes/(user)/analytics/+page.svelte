@@ -88,6 +88,7 @@
     }).catch((err: any): string => {
       // WARN: is this a bad idea? idk xD
       // who cares, i'll swallow the error xD
+      no_feedback_data = true;
       return '';
     });
     const parsed_data = generate_report(
@@ -170,7 +171,7 @@
             class="px-14 py-4 flex flex-col items-center justify-center h-full"
           >
             <h1 class="font-bold text-2xl">
-              No data to show. Page will reload in 3 seconds.
+              No data to show. Ensure the database is not empty.
             </h1>
           </div>
         {/if}
