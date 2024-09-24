@@ -28,6 +28,8 @@
 
   let suggested_services: string[] = [];
   let accepted_suggestion: boolean = false;
+  let office_name: string = 'NOT CONFIGURED';
+
   type ServiceData = {
     name: string;
   };
@@ -310,6 +312,20 @@
       await goto('/feedback/consent');
       return;
     }
+    type ConfigData = {
+      name: string;
+      value: string;
+    };
+    try {
+      const configs: ConfigData[] = await invoke('get_configs');
+      configs.forEach((config) => {
+        if (config.name === 'office_name') {
+          office_name = config.value;
+        }
+      });
+    } catch (err) {
+      console.log('failed to get office name from configs database!');
+    }
     await load_services();
     // TEST: for aesthetics we will delay the load for a second xD
     setTimeout(() => {
@@ -478,6 +494,13 @@
                 class="input input-bordered w-full"
               />
             {/if}
+            <p class="text-xl font-bold mt-4">Office</p>
+            <input
+              type="text"
+              bind:value={office_name}
+              class="input input-bordered w-full"
+              readonly
+            />
             <p class="text-xl font-bold mt-4">Purpose of Visit</p>
             <input
               type="text"
