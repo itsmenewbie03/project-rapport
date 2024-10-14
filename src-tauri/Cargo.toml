@@ -24,7 +24,11 @@ tauri = { version = "1.6.4", features = [
   "dialog-confirm",
   "notification",
 ] }
-sqlx = { version = "0.7.4", features = ["runtime-tokio-native-tls", "sqlite"] }
+sqlx = { version = "0.7.4", features = [
+  "runtime-tokio-native-tls",
+  "sqlite",
+  "mysql",
+] }
 tokio = { version = "1.38.0", features = ["macros"] }
 bcrypt = "0.15.1"
 jsonwebtoken = { version = "9", default-features = false }
