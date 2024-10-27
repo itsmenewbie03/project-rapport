@@ -21,6 +21,7 @@
   let other_client_type: string = '';
   let contact_number: string = '';
   let name: string = '';
+  let comments: string = '';
   let purpose_of_visit: string = '';
   let initial_step_done = false;
 
@@ -195,6 +196,7 @@
       office_name,
       contact_number,
       name,
+      comments,
     };
 
     // TODO: check for 0s in data
@@ -385,10 +387,12 @@
               class="btn btn-ghost btn-sm underline"
               on:click={async () => {
                 dont_stop = true;
-                // NOTE: stop recording when they go back to consent screen
-                await invoke('clear_recording', {
-                  id: "I DON'T HAVE ENOUGH TIME TO IMPLEMENT THIS PROPERLY xD!",
-                });
+                if (recording) {
+                  // NOTE: stop recording when they go back to consent screen
+                  await invoke('clear_recording', {
+                    id: "I DON'T HAVE ENOUGH TIME TO IMPLEMENT THIS PROPERLY xD!",
+                  });
+                }
                 await goto('/feedback/consent');
               }}
             >
@@ -662,6 +666,14 @@
                   </p>
                   <SmileyRatingBar bind:group={overall_satisfaction} />
                 </div>
+                <p class="text-xl font-bold my-4">
+                  Please write your compliments, comments, or suggestions below:
+                </p>
+                <textarea
+                  placeholder="Type Here..."
+                  bind:value={comments}
+                  class="textarea textarea-bordered"
+                ></textarea>
               </div>
             </div>
             <div class="float-end">
