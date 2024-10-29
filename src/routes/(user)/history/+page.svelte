@@ -42,7 +42,14 @@
         loaded = true;
       }, 1000);
     });
-    const parsed_data = history_parser(hybrid_feedback_data);
+    // TODO: load the emotion_weight from configs
+    // for now it's just a constant 0.5
+    const configs: { name: string; value: string }[] =
+      await invoke('get_configs');
+    const emotion_weight_conf =
+      configs.find((e) => e.name === 'emotion_weight')?.value || '0.50';
+    const emotion_weight = parseFloat(emotion_weight_conf);
+    const parsed_data = history_parser(hybrid_feedback_data, emotion_weight);
     handler.setRows(parsed_data);
     // TEST: for aesthetics we will delay the load for a second xD
     setTimeout(() => {
@@ -72,7 +79,7 @@
                     <Th {handler} orderBy="overall_emotion_percent"
                       >Overall Emotion Percentage</Th
                     >
-                    <Th {handler} orderBy="tag">Tag</Th>
+                    <Th {handler} orderBy="final_rating">Final Rating</Th>
                     <th></th>
                   </tr>
                   <tr>
@@ -82,7 +89,7 @@
                     <ThFilter {handler} filterBy="mean_rating_percent" />
                     <ThFilter {handler} filterBy="overall_emotion" />
                     <ThFilter {handler} filterBy="overall_emotion_percent" />
-                    <ThFilter {handler} filterBy="tag" />
+                    <ThFilter {handler} filterBy="final_rating" />
                   </tr>
                 </thead>
                 <tbody>
@@ -94,7 +101,7 @@
                       <td>{row.mean_rating_percent}%</td>
                       <td>{row.overall_emotion}</td>
                       <td>{row.overall_emotion_percent}%</td>
-                      <td>{row.tag}</td>
+                      <td>{row.final_rating}</td>
                       <td>
                         <button
                           class="btn btn-primary btn-xs"
