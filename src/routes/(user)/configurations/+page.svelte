@@ -13,6 +13,8 @@
   let max_negative_feedback: number = 3;
   let email_recipient: string = 'email@example.com';
   let office_name: string = 'NOT CONFIGURED YET';
+  let emotion_weight: number = 0;
+  let emotion_weight_input: HTMLInputElement;
   let enable_consent_screen: string = 'false';
   let services_list: string[] = [];
 
@@ -30,12 +32,18 @@
       toast.error('Invalid email address.');
       return;
     }
+    if (emotion_weight < 0.01 || emotion_weight > 0.99) {
+      toast.error('Emotion weight must be between 0.01 and 0.99.');
+      emotion_weight_input.focus();
+      return;
+    }
     const config_data = {
       // NOTE: we won't do dyn in rust to JS will adjust xD
       max_negative_feedback: max_negative_feedback.toString(),
       email_recipient,
       office_name,
       enable_consent_screen,
+      emotion_weight: emotion_weight.toString(),
     };
     try {
       const config_saved: string = await invoke('save_configs', {
@@ -163,6 +171,8 @@
           office_name = config.value;
         } else if (config.name === 'enable_consent_screen') {
           enable_consent_screen = config.value;
+        } else if (config.name === 'emotion_weight') {
+          emotion_weight = parseFloat(config.value);
         }
       });
       console.log('CONFIGS', configs);
@@ -227,7 +237,26 @@
             />
             <div class="label">
               <span class="label-text-alt"
-                >The name of the office in which this kiosk is deployed.</span
+                >The name of the office in which this system is deployed.</span
+              >
+            </div>
+          </label>
+          <label class="form-control w-full">
+            <div class="label">
+              <span class="label-text">Emotion Weight</span>
+            </div>
+            <input
+              type="number"
+              max="0.99"
+              min="0.01"
+              step="0.01"
+              class="input input-bordered w-full"
+              bind:value={emotion_weight}
+              bind:this={emotion_weight_input}
+            />
+            <div class="label">
+              <span class="label-text-alt"
+                >Specifies how much should emotion affect the final rating.</span
               >
             </div>
           </label>
